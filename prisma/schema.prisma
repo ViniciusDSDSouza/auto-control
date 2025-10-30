@@ -7,79 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum NoteStatus {
-  OPEN
-  PAID
-  CANCELLED
-}
-
 model User {
   id        String   @id @default(uuid())
-  name      String
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  name      String
 }
 
 model Customer {
   id        String   @id @default(uuid())
-  name String 
-  phone String?
-  email String? @unique
-  cars Car[]
-  notes Note[]
+  name      String
+  phone     String?
+  email     String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  cars      Car[]
+  notes     Note[]
 }
 
 model Car {
-  id        String   @id @default(uuid())
-  customer Customer @relation(fields: [customerId], references: [id])
+  id         String   @id @default(uuid())
   customerId String
-  brand String
-  model String
-  plate String?
-  year Int?
-  notes Note[]
-  color String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  brand      String
+  model      String
+  plate      String?
+  year       Int?
+  color      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  customer   Customer @relation(fields: [customerId], references: [id])
+  notes      Note[]
 }
 
 model Part {
-  id String @id @default(uuid())
-  name String
-  model String
-  price Float
+  id          String       @id @default(uuid())
+  name        String
+  model       String
+  price       Float
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   usedInNotes PartInNote[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Note {
-  id String @id @default(uuid())
-  customer Customer @relation(fields: [customerId], references: [id])
+  id         String       @id @default(uuid())
   customerId String
-  car Car @relation(fields: [carId], references: [id])
-  carId String
+  carId      String
   laborPrice Float
-  partsPrice Float
   totalPrice Float
-  parts PartInNote[]
-  status NoteStatus @default(OPEN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  partsPrice Float
+  status     NoteStatus   @default(OPEN)
+  car        Car          @relation(fields: [carId], references: [id])
+  customer   Customer     @relation(fields: [customerId], references: [id])
+  parts      PartInNote[]
 }
 
 model PartInNote {
-  id String @id @default(uuid())
-  note Note @relation(fields: [noteId], references: [id])
-  noteId String
-  part Part @relation(fields: [partId], references: [id])
-  partId String
-  quantity Int
-  price Float
+  id        String   @id @default(uuid())
+  noteId    String
+  partId    String
+  quantity  Int
+  price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  note      Note     @relation(fields: [noteId], references: [id])
+  part      Part     @relation(fields: [partId], references: [id])
+}
+
+enum NoteStatus {
+  OPEN
+  PAID
+  CANCELLED
 }
