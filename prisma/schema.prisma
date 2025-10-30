@@ -15,3 +15,63 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Customer {
+  id        String   @id @default(uuid())
+  name String 
+  phone String?
+  email String? @unique
+  cars Car[]
+  notes Note[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Car {
+  id        String   @id @default(uuid())
+  customer Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  brand String
+  model String
+  plate String?
+  year Int?
+  notes Note[]
+  color String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Part {
+  id String @id @default(uuid())
+  name String
+  model String
+  price Float
+  usedInNotes PartInNote[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Note {
+  id String @id @default(uuid())
+  customer Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  car Car @relation(fields: [carId], references: [id])
+  carId String
+  laborPrice Float
+  totalPrice Float
+  parts PartInNote[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PartInNote {
+  id String @id @default(uuid())
+  note Note @relation(fields: [noteId], references: [id])
+  noteId String
+  part Part @relation(fields: [partId], references: [id])
+  partId String
+  quantity Int
+  price Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
