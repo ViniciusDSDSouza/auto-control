@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum NoteStatus {
+  OPEN
+  PAID
+  CANCELLED
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -58,8 +64,10 @@ model Note {
   car Car @relation(fields: [carId], references: [id])
   carId String
   laborPrice Float
+  partsPrice Float
   totalPrice Float
   parts PartInNote[]
+  status NoteStatus @default(OPEN)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
