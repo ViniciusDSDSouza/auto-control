@@ -1,0 +1,13 @@
+import { Box, Stack } from "@chakra-ui/react";
+
+export default function ClientesPage() {
+  return (
+    <Box bg="orange.50">
+      <Stack>
+        <Box fontSize="2xl" fontWeight="bold" color="orange.600">
+          Clientes
+        </Box>
+      </Stack>
+    </Box>
+  );
+}
