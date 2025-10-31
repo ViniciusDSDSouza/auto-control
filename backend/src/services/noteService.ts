@@ -1,16 +1,134 @@
 import { prisma } from "../db/client";
-import { NoteDto } from "../types/note";
+import {
+  NoteDto,
+  Note,
+  GetNotesParams,
+  PaginatedResponse,
+} from "../types/note";
+import { Prisma } from "@prisma/client";
 
-export const getAllNotes = async () => {
+export const getAllNotes = async ({
+  page = 1,
+  itemsPerPage = 10,
+  customerId,
+  carId,
+  status,
+  orderBy = "updatedAt",
+  orderDirection = "desc",
+}: GetNotesParams): Promise<PaginatedResponse<Note>> => {
   try {
+    const where: Prisma.NoteWhereInput = {};
+
+    if (customerId) {
+      where.customerId = customerId;
+    }
+    if (carId) {
+      where.carId = carId;
+    }
+    if (status) {
+      where.status = status;
+    }
+
+    const total = await prisma.note.count({ where });
+
+    const orderByConfig: Prisma.NoteOrderByWithRelationInput = {};
+    if (orderBy === "customerId") {
+      orderByConfig.customerId = orderDirection;
+    } else if (orderBy === "carId") {
+      orderByConfig.carId = orderDirection;
+    } else if (orderBy === "laborPrice") {
+      orderByConfig.laborPrice = orderDirection;
+    } else if (orderBy === "totalPrice") {
+      orderByConfig.totalPrice = orderDirection;
+    } else if (orderBy === "status") {
+      orderByConfig.status = orderDirection;
+    } else if (orderBy === "createdAt") {
+      orderByConfig.createdAt = orderDirection;
+    } else {
+      orderByConfig.updatedAt = orderDirection;
+    }
+
     const notes = await prisma.note.findMany({
+      skip: (page - 1) * itemsPerPage,
+      take: itemsPerPage,
+      orderBy: orderByConfig,
+      where,
       include: {
-        customer: true,
-        car: true,
-        parts: true,
+        customer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        car: {
+          select: {
+            id: true,
+            brand: true,
+            model: true,
+            plate: true,
+            year: true,
+            color: true,
+          },
+        },
+        parts: {
+          include: {
+            part: {
+              select: {
+                id: true,
+                name: true,
+                model: true,
+                price: true,
+              },
+            },
+          },
+        },
       },
     });
-    return notes;
+
+    const totalPages = Math.ceil(total / itemsPerPage);
+
+    return {
+      data: notes.map((note) => ({
+        id: note.id,
+        customerId: note.customerId,
+        carId: note.carId,
+        laborPrice: note.laborPrice,
+        partsPrice: note.partsPrice,
+        totalPrice: note.totalPrice,
+        status: note.status,
+        createdAt: note.createdAt.toISOString(),
+        updatedAt: note.updatedAt.toISOString(),
+        customer: note.customer,
+        car: note.car
+          ? {
+              id: note.car.id,
+              brand: note.car.brand,
+              model: note.car.model,
+              plate: note.car.plate ?? undefined,
+              year: note.car.year ?? undefined,
+              color: note.car.color,
+            }
+          : undefined,
+        parts: note.parts.map((p) => ({
+          id: p.id,
+          noteId: p.noteId,
+          partId: p.partId,
+          quantity: p.quantity,
+          price: p.price,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+          part: p.part,
+        })),
+      })),
+      pagination: {
+        page,
+        itemsPerPage,
+        totalItems: total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get all notes");

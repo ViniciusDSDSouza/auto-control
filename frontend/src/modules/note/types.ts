@@ -1,6 +1,10 @@
-import { NoteStatus } from "@prisma/client";
+export enum NoteStatus {
+  OPEN = "OPEN",
+  PAID = "PAID",
+  CANCELLED = "CANCELLED",
+}
 
-interface PartInNoteDto {
+export interface PartInNoteDto {
   partId: string;
   quantity: number;
   price: number;
@@ -32,8 +36,14 @@ export interface PartInNote {
   };
 }
 
-export interface Note extends NoteDto {
+export interface Note {
   id: string;
+  customerId: string;
+  carId: string;
+  laborPrice: number;
+  partsPrice: number;
+  totalPrice: number;
+  status: NoteStatus;
   createdAt: string;
   updatedAt: string;
   customer?: {

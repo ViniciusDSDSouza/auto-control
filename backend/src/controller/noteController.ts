@@ -6,11 +6,33 @@ import {
   updateNote,
   deleteNote,
 } from "../services/noteService";
-import { NoteDto } from "../types/note";
+import { NoteDto, GetNotesParams } from "../types/note";
+import { NoteStatus } from "@prisma/client";
 
-export const getAllNotesController = async (_req: Request, res: Response) => {
+export const getAllNotesController = async (req: Request, res: Response) => {
   try {
-    const notes = await getAllNotes();
+    const {
+      page,
+      itemsPerPage,
+      customerId,
+      carId,
+      status,
+      orderBy,
+      orderDirection,
+    } = req.query;
+
+    const params: GetNotesParams = {};
+    if (page) params.page = parseInt(page as string, 10);
+    if (itemsPerPage)
+      params.itemsPerPage = parseInt(itemsPerPage as string, 10);
+    if (customerId) params.customerId = customerId as string;
+    if (carId) params.carId = carId as string;
+    if (status) params.status = status as NoteStatus;
+    if (orderBy) params.orderBy = orderBy as GetNotesParams["orderBy"];
+    if (orderDirection)
+      params.orderDirection = orderDirection as "asc" | "desc";
+
+    const notes = await getAllNotes(params);
     res.status(200).json(notes);
   } catch (error) {
     console.error(error);
