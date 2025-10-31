@@ -10,3 +10,4 @@ export { Provider } from "./provider";
 export { CustomerTableSkeleton } from "./CustomerTableSkeleton";
 export { CustomerFormDialog } from "./CustomerFormDialog";
 export { PartFormDialog } from "./PartFormDialog";
+export { CarFormDialog } from "./CarFormDialog";

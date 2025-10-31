@@ -6,11 +6,28 @@ import {
   updateCar,
   deleteCar,
 } from "../services/carService";
-import { CarDto } from "../types/cars";
+import { CarDto, GetCarsParams } from "../types/cars";
 
-export const getAllCarsController = async (_req: Request, res: Response) => {
+export const getAllCarsController = async (
+  req: Request<{}, {}, {}, any>,
+  res: Response
+) => {
   try {
-    const cars = await getAllCars();
+    const query = req.query;
+    const params: GetCarsParams = {
+      page: query.page ? Number(query.page) : undefined,
+      itemsPerPage: query.itemsPerPage ? Number(query.itemsPerPage) : undefined,
+      brand: query.brand as string | undefined,
+      customerId: query.customerId as string | undefined,
+      orderBy: query.orderBy as
+        | "brand"
+        | "model"
+        | "year"
+        | "updatedAt"
+        | undefined,
+      orderDirection: query.orderDirection as "asc" | "desc" | undefined,
+    };
+    const cars = await getAllCars(params);
     res.status(200).json(cars);
   } catch (error) {
     console.error(error);
