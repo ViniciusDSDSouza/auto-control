@@ -1,25 +1,12 @@
 "use client";
 
-import {
-  Dialog,
-  Stack,
-  Button,
-  Text,
-  HStack,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValueText,
-  SelectPositioner,
-  createListCollection,
-} from "@chakra-ui/react";
+import { Dialog, Stack, Button, Text, HStack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInput } from "./FormInput";
+import { AsyncSelectCustomer } from "./AsyncSelectCustomer";
 import { carSchema, CarSchema } from "@/src/modules/car/schema";
 import { Car } from "@/src/modules/car/types";
-import { useGetCustomers } from "@/src/modules/customer/hooks";
 
 interface CarFormDialogProps {
   isOpen: boolean;
@@ -36,17 +23,6 @@ export function CarFormDialog({
   car,
   isLoading = false,
 }: CarFormDialogProps) {
-  const { customers } = useGetCustomers(
-    isOpen ? { itemsPerPage: 1000 } : undefined
-  );
-
-  const customersCollection = createListCollection({
-    items: customers.map((customer) => ({
-      value: customer.id,
-      label: customer.name,
-    })),
-  });
-
   const {
     register,
     handleSubmit,
@@ -116,33 +92,16 @@ export function CarFormDialog({
                   <Text fontSize="sm" fontWeight="medium">
                     Cliente *
                   </Text>
-                  <Select.Root
-                    collection={customersCollection}
-                    value={customerIdValue ? [customerIdValue] : []}
-                    onValueChange={(e) => {
-                      setValue("customerId", e.value[0] || "", {
+                  <AsyncSelectCustomer
+                    value={customerIdValue}
+                    onChange={(value) => {
+                      setValue("customerId", value, {
                         shouldValidate: true,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValueText placeholder="Selecione um cliente" />
-                    </SelectTrigger>
-                    <SelectPositioner>
-                      <SelectContent>
-                        {customersCollection.items.map((item) => (
-                          <SelectItem key={item.value} item={item}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </SelectPositioner>
-                  </Select.Root>
-                  {errors.customerId && (
-                    <Text fontSize="sm" color="red.500">
-                      {errors.customerId.message}
-                    </Text>
-                  )}
+                    error={errors.customerId?.message}
+                    placeholder="Digite para buscar um cliente"
+                  />
                 </Stack>
 
                 <FormInput
