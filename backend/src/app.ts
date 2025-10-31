@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { authRoutes } from "./routes/authRoutes";
 import { customerRoutes } from "./routes/customerRoutes";
 import { carRoutes } from "./routes/carRoutes";
@@ -7,6 +8,15 @@ import { enumNoteStatusRoutes } from "./routes/enumNoteStatusRoutes";
 import { noteRoutes } from "./routes/noteRoutes";
 
 export const app = express();
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    methods: "GET, POST, PUT, DELETE",
+    allowedHeaders: "Content-Type, Authorization",
+  })
+);
+
 app.use(express.json());
 
 app.use("/", authRoutes);
