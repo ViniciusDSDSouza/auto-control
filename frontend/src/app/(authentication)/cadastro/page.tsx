@@ -8,19 +8,21 @@ import {
   PasswordInput,
   AuthButton,
   AuthLink,
-} from "@/components/ui";
+} from "@/src/components/ui";
+import { registerSchema, RegisterSchema } from "./schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserRegisterPage } from "./userRegisterPage";
 
-type LoginFormData = {
-  email: string;
-  password: string;
-};
+export default function RegisterPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterSchema>({
+    resolver: zodResolver(registerSchema),
+  });
 
-export default function LoginPage() {
-  const { register, handleSubmit } = useForm<LoginFormData>();
-
-  const onSubmit = (data: LoginFormData) => {
-    console.log(data);
-  };
+  const { onSubmit } = UserRegisterPage();
 
   return (
     <Box
@@ -72,34 +74,50 @@ export default function LoginPage() {
         <Box w={{ base: "100%", md: "60%" }} p={8}>
           <Stack gap={2} mb={6}>
             <Box fontSize="3xl" fontWeight="bold" color="orange.600">
-              Login
+              Cadastro
             </Box>
             <Box color="gray.600" fontSize="md">
-              Entre com sua conta para acessar o sistema
+              Crie sua conta para começar a usar o sistema
             </Box>
           </Stack>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={4}>
               <FormInput
+                label="Nome completo"
+                placeholder="Digite seu nome"
+                error={errors.name?.message}
+                {...register("name")}
+              />
+
+              <FormInput
                 label="E-mail"
                 type="email"
                 placeholder="Digite seu email"
+                error={errors.email?.message}
                 {...register("email")}
               />
 
               <PasswordInput
                 label="Senha"
                 placeholder="Digite sua senha"
+                error={errors.password?.message}
                 {...register("password")}
               />
 
-              <AuthButton type="submit">Entrar</AuthButton>
+              <PasswordInput
+                label="Confirmar senha"
+                placeholder="Digite sua senha novamente"
+                error={errors.confirmPassword?.message}
+                {...register("confirmPassword")}
+              />
+
+              <AuthButton type="submit">Criar conta</AuthButton>
 
               <AuthLink
-                question="Não tem uma conta?"
-                linkText="Cadastre-se"
-                href="/cadastro"
+                question="Já tem uma conta?"
+                linkText="Faça login"
+                href="/login"
               />
             </Stack>
           </form>

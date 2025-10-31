@@ -8,18 +8,17 @@ import {
   PasswordInput,
   AuthButton,
   AuthLink,
-} from "@/components/ui";
+} from "@/src/components/ui";
 
-type RegisterFormData = {
-  name: string;
+type LoginFormData = {
   email: string;
   password: string;
 };
 
-export default function RegisterPage() {
-  const { register, handleSubmit } = useForm<RegisterFormData>();
+export default function LoginPage() {
+  const { register, handleSubmit } = useForm<LoginFormData>();
 
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = (data: LoginFormData) => {
     console.log(data);
   };
 
@@ -73,21 +72,15 @@ export default function RegisterPage() {
         <Box w={{ base: "100%", md: "60%" }} p={8}>
           <Stack gap={2} mb={6}>
             <Box fontSize="3xl" fontWeight="bold" color="orange.600">
-              Cadastro
+              Login
             </Box>
             <Box color="gray.600" fontSize="md">
-              Crie sua conta para começar a usar o sistema
+              Entre com sua conta para acessar o sistema
             </Box>
           </Stack>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={4}>
-              <FormInput
-                label="Nome completo"
-                placeholder="Digite seu nome"
-                {...register("name")}
-              />
-
               <FormInput
                 label="E-mail"
                 type="email"
@@ -101,12 +94,12 @@ export default function RegisterPage() {
                 {...register("password")}
               />
 
-              <AuthButton type="submit">Criar conta</AuthButton>
+              <AuthButton type="submit">Entrar</AuthButton>
 
               <AuthLink
-                question="Já tem uma conta?"
-                linkText="Faça login"
-                href="/login"
+                question="Não tem uma conta?"
+                linkText="Cadastre-se"
+                href="/cadastro"
               />
             </Stack>
           </form>

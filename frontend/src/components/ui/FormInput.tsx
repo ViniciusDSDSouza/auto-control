@@ -5,10 +5,16 @@ import { UseFormRegisterReturn } from "react-hook-form";
 
 interface FormInputProps extends InputProps {
   label?: string;
+  error?: string;
   register?: UseFormRegisterReturn;
 }
 
-export function FormInput({ label, register, ...props }: FormInputProps) {
+export function FormInput({
+  label,
+  error,
+  register,
+  ...props
+}: FormInputProps) {
   return (
     <Stack gap={1}>
       {label && (
@@ -19,14 +25,21 @@ export function FormInput({ label, register, ...props }: FormInputProps) {
       <Input
         size="lg"
         borderRadius="lg"
-        borderColor="gray.300"
+        borderColor={error ? "red.500" : "gray.300"}
         _focus={{
-          borderColor: "orange.500",
-          boxShadow: "0 0 0 1px var(--chakra-colors-orange-500)",
+          borderColor: error ? "red.500" : "orange.500",
+          boxShadow: error
+            ? "0 0 0 1px var(--chakra-colors-red-500)"
+            : "0 0 0 1px var(--chakra-colors-orange-500)",
         }}
         {...props}
         {...register}
       />
+      {error && (
+        <Text fontSize="sm" color="red.500">
+          {error}
+        </Text>
+      )}
     </Stack>
   );
 }

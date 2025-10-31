@@ -15,11 +15,13 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 interface PasswordInputProps extends Omit<InputProps, "type"> {
   label?: string;
   placeholder?: string;
+  error?: string;
 }
 
 export function PasswordInput({
   label,
   placeholder = "Digite sua senha",
+  error,
   ...props
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,16 +52,23 @@ export function PasswordInput({
         <Input
           size="lg"
           borderRadius="lg"
-          borderColor="gray.300"
+          borderColor={error ? "red.500" : "gray.300"}
           _focus={{
-            borderColor: "orange.500",
-            boxShadow: "0 0 0 1px var(--chakra-colors-orange-500)",
+            borderColor: error ? "red.500" : "orange.500",
+            boxShadow: error
+              ? "0 0 0 1px var(--chakra-colors-red-500)"
+              : "0 0 0 1px var(--chakra-colors-orange-500)",
           }}
           placeholder={placeholder}
           type={showPassword ? "text" : "password"}
           {...props}
         />
       </InputGroup>
+      {error && (
+        <Text fontSize="sm" color="red.500">
+          {error}
+        </Text>
+      )}
     </Stack>
   );
 }
