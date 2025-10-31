@@ -9,18 +9,16 @@ import {
   AuthButton,
   AuthLink,
 } from "@/src/components/ui";
-
-type LoginFormData = {
-  email: string;
-  password: string;
-};
+import { loginSchema, LoginSchema } from "./schema";
+import { useLoginPage } from "./useLoginPage";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function LoginPage() {
-  const { register, handleSubmit } = useForm<LoginFormData>();
+  const { register, handleSubmit } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log(data);
-  };
+  const { onSubmit, isLoading } = useLoginPage();
 
   return (
     <Box
@@ -94,7 +92,13 @@ export default function LoginPage() {
                 {...register("password")}
               />
 
-              <AuthButton type="submit">Entrar</AuthButton>
+              <AuthButton
+                type="submit"
+                loading={isLoading}
+                loadingText="Carregando..."
+              >
+                Entrar
+              </AuthButton>
 
               <AuthLink
                 question="Não tem uma conta?"

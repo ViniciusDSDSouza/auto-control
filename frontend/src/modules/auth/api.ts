@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "@/src/store/baseQuery";
-import { RegisterUserDto } from "./types";
+import { RegisterUserDto, LoginUserDto, LoginUserResponse } from "./types";
 
 export const authApi = createApi({
   baseQuery,
@@ -8,7 +8,10 @@ export const authApi = createApi({
     registerUser: builder.mutation<void, RegisterUserDto>({
       query: (data) => ({ url: "/register", method: "POST", body: data }),
     }),
+    loginUser: builder.mutation<LoginUserResponse, LoginUserDto>({
+      query: (data) => ({ url: "/login", method: "POST", body: data }),
+    }),
   }),
 });
 
-export const { useRegisterUserMutation } = authApi;
+export const { useRegisterUserMutation, useLoginUserMutation } = authApi;

@@ -1,8 +1,9 @@
-import { useRegisterUserMutation } from "./api";
+import { useLoginUserMutation, useRegisterUserMutation } from "./api";
 import { RegisterSchema } from "@/src/app/(authentication)/cadastro/schema";
-import { registerFormToDto } from "./adapter";
+import { loginFormToDto, registerFormToDto } from "./adapter";
 import { useRouter } from "next/navigation";
 import { toaster } from "@/src/components/ui/toaster";
+import { LoginSchema } from "@/src/app/(authentication)/login/schema";
 
 export function useRegisterUser() {
   const router = useRouter();
@@ -35,6 +36,43 @@ export function useRegisterUser() {
 
   return {
     handleRegisterUser,
+    isLoading,
+  };
+}
+
+export function useLoginUser() {
+  const router = useRouter();
+  const [loginUser, { isLoading }] = useLoginUserMutation();
+
+  async function handleLoginUser(data: LoginSchema) {
+    try {
+      const response = await loginUser(loginFormToDto(data)).unwrap();
+
+      localStorage.setItem("token", response.token);
+
+      toaster.create({
+        title: "Login realizado com sucesso!",
+        description: "Você pode agora acessar o sistema!",
+        type: "success",
+        duration: 5000,
+      });
+
+      router.push("/notas");
+      return response;
+    } catch (error) {
+      toaster.create({
+        title: "Erro ao fazer login!",
+        description: "Por favor, tente novamente!",
+        type: "error",
+        duration: 5000,
+      });
+
+      throw error;
+    }
+  }
+
+  return {
+    handleLoginUser,
     isLoading,
   };
 }
