@@ -23,14 +23,15 @@ export function useRegisterUser() {
       router.push("/login");
       return response;
     } catch (error) {
+      const errorMessage =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Erro desconhecido ao registrar usuário";
       toaster.create({
         title: "Erro ao registrar usuário!",
-        description: "Por favor, tente novamente!",
+        description: errorMessage,
         type: "error",
         duration: 5000,
       });
-
-      throw error;
     }
   }
 

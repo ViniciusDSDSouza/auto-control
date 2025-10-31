@@ -12,8 +12,9 @@ export const registerController = async (
 
     res.status(201).json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to register user" });
+    const message =
+      error instanceof Error ? error.message : "Erro ao registrar usuário";
+    res.status(500).json({ message });
   }
 };
 

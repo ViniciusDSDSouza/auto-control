@@ -22,7 +22,6 @@ export default function LoginPage() {
 
   return (
     <Box
-      suppressHydrationWarning
       minH="100vh"
       bgGradient="linear(to-br, orange.50, orange.100)"
       display="flex"

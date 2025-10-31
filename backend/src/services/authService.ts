@@ -9,6 +9,11 @@ export const registerUser = async ({
   name,
 }: RegisterUserDto) => {
   try {
+    const usersCount = await prisma.user.count();
+    if (usersCount > 0) {
+      throw new Error("Não é possível criar mais usuários");
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: { name, email, password: hashedPassword },
@@ -16,7 +21,10 @@ export const registerUser = async ({
     return user;
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to register user");
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Erro ao registrar usuário");
   }
 };
 

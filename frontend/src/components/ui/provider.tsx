@@ -8,10 +8,12 @@ import { ReactNode } from "react";
 export function Provider({ children }: { children: ReactNode }) {
   return (
     <StoreProvider>
-      <ChakraProvider value={defaultSystem}>
-        {children}
-        <Toaster />
-      </ChakraProvider>
+      <div suppressHydrationWarning>
+        <ChakraProvider value={defaultSystem}>
+          {children}
+          <Toaster />
+        </ChakraProvider>
+      </div>
     </StoreProvider>
   );
 }
