@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   useGetCustomers,
   useDeleteCustomer,
@@ -7,46 +7,87 @@ import {
 } from "@/src/modules/customer/hooks";
 import { Customer } from "@/src/modules/customer/types";
 import { CustomerSchema } from "@/src/modules/customer/schema";
+import { GetCustomersParams } from "@/src/modules/customer/types";
 
-export function useCustomersPage() {
-  const { customers, isLoading: isLoadingCustomers } = useGetCustomers();
-  const { handleDeleteCustomer } = useDeleteCustomer();
+export function useCustomersGet() {
+  const [params, setParams] = useState<GetCustomersParams>({
+    page: 1,
+    itemsPerPage: 10,
+    name: "",
+    orderBy: "updatedAt",
+    orderDirection: "desc",
+  });
+
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParams((prev) => ({
+        ...prev,
+        name: searchInput,
+        page: 1,
+      }));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const {
+    customers,
+    pagination,
+    isLoading: isLoadingCustomers,
+  } = useGetCustomers(params);
+
+  const handleSearchChange = (searchValue: string) => {
+    setSearchInput(searchValue);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setParams((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setParams((prev) => ({
+      ...prev,
+      itemsPerPage: newItemsPerPage,
+      page: 1,
+    }));
+  };
+
+  const handleOrderChange = (
+    orderBy: "name" | "email" | "phone" | "updatedAt",
+    orderDirection: "asc" | "desc"
+  ) => {
+    setParams((prev) => ({
+      ...prev,
+      orderBy,
+      orderDirection,
+      page: 1,
+    }));
+  };
+
+  return {
+    customers,
+    pagination,
+    isLoadingCustomers,
+    params,
+    searchInput,
+    handleSearchChange,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleOrderChange,
+  };
+}
+
+export function useCustomersEdit() {
   const { handleCreateCustomer, isLoading: isCreating } = useCreateCustomer();
   const { handleUpdateCustomer, isLoading: isUpdating } = useUpdateCustomer();
-  const [search, setSearch] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+
   const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
-
-  const filteredCustomers = useMemo(
-    () =>
-      customers.filter((customer) =>
-        customer.name.toLowerCase().includes(search.toLowerCase())
-      ),
-    [customers, search]
-  );
-
-  const handleDeleteClick = (id: string, name: string) => {
-    setDeleteConfirm({ id, name });
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deleteConfirm) return;
-
-    try {
-      await handleDeleteCustomer(deleteConfirm.id, deleteConfirm.name);
-      setDeleteConfirm(null);
-    } catch {
-      setDeleteConfirm(null);
-    }
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setDeleteConfirm(null);
-  };
 
   const handleOpenCreateDialog = () => {
     setEditingCustomer(null);
@@ -72,14 +113,6 @@ export function useCustomersPage() {
   };
 
   return {
-    customers: filteredCustomers,
-    isLoadingCustomers,
-    search,
-    setSearch,
-    deleteConfirm,
-    handleDeleteClick,
-    handleDeleteConfirm,
-    handleCloseDeleteDialog,
     isCustomerDialogOpen,
     editingCustomer,
     handleOpenCreateDialog,
@@ -87,5 +120,40 @@ export function useCustomersPage() {
     handleCloseCustomerDialog,
     handleCustomerSubmit,
     isSavingCustomer: isCreating || isUpdating,
+  };
+}
+
+export function useCustomersDelete() {
+  const { handleDeleteCustomer } = useDeleteCustomer();
+
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteConfirm({ id, name });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm) return;
+
+    try {
+      await handleDeleteCustomer(deleteConfirm.id, deleteConfirm.name);
+      setDeleteConfirm(null);
+    } catch {
+      setDeleteConfirm(null);
+    }
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteConfirm(null);
+  };
+
+  return {
+    deleteConfirm,
+    handleDeleteClick,
+    handleDeleteConfirm,
+    handleCloseDeleteDialog,
   };
 }

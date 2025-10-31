@@ -12,21 +12,45 @@ import {
   Icon,
   Dialog,
   Text,
+  Pagination,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValueText,
+  SelectPositioner,
+  createListCollection,
+  ButtonGroup,
 } from "@chakra-ui/react";
 import { CustomerTableSkeleton, CustomerFormDialog } from "@/src/components/ui";
-import { useCustomersPage } from "./useCustomersPage";
+import {
+  useCustomersGet,
+  useCustomersEdit,
+  useCustomersDelete,
+} from "./useCustomersPage";
 import { FaPlus, FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 export default function ClientesPage() {
   const {
     customers,
+    pagination,
     isLoadingCustomers,
-    search,
-    setSearch,
+    params,
+    searchInput,
+    handleSearchChange,
+    handlePageChange,
+    handleItemsPerPageChange,
+  } = useCustomersGet();
+
+  const {
     deleteConfirm,
     handleDeleteClick,
     handleDeleteConfirm,
     handleCloseDeleteDialog,
+  } = useCustomersDelete();
+
+  const {
     isCustomerDialogOpen,
     editingCustomer,
     handleOpenCreateDialog,
@@ -34,7 +58,7 @@ export default function ClientesPage() {
     handleCloseCustomerDialog,
     handleCustomerSubmit,
     isSavingCustomer,
-  } = useCustomersPage();
+  } = useCustomersEdit();
 
   return (
     <Box>
@@ -64,9 +88,9 @@ export default function ClientesPage() {
             }
           >
             <Input
-              placeholder="Buscar por nome..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Pesquisar por nome"
+              value={searchInput || ""}
+              onChange={(e) => handleSearchChange(e.target.value)}
               size="lg"
               fontSize="md"
               borderRadius="lg"
@@ -102,6 +126,7 @@ export default function ClientesPage() {
                     minW="200px"
                     w="40%"
                     color="black"
+                    pl={4}
                   >
                     Nome Completo
                   </Table.ColumnHeader>
@@ -150,7 +175,7 @@ export default function ClientesPage() {
                 ) : (
                   customers.map((customer) => (
                     <Table.Row key={customer.id} _hover={{ bg: "orange.50" }}>
-                      <Table.Cell fontSize="lg" minW="200px">
+                      <Table.Cell fontSize="lg" minW="200px" pl={4}>
                         {customer.name}
                       </Table.Cell>
                       <Table.Cell fontSize="lg" color="gray.600" minW="180px">
@@ -199,6 +224,128 @@ export default function ClientesPage() {
                 )}
               </Table.Body>
             </Table.Root>
+
+            {pagination && (
+              <Box
+                borderTopWidth="1px"
+                px={6}
+                py={4}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <HStack gap={2} alignItems="center">
+                  <Text fontSize="sm" color="gray.600">
+                    Itens por página:
+                  </Text>
+                  <Select.Root
+                    collection={createListCollection({
+                      items: [
+                        { label: "5", value: "5" },
+                        { label: "10", value: "10" },
+                        { label: "25", value: "25" },
+                      ],
+                    })}
+                    value={[params.itemsPerPage?.toString() || "10"]}
+                    onValueChange={(details) =>
+                      handleItemsPerPageChange(Number(details.value[0]))
+                    }
+                    positioning={{ placement: "bottom-start" }}
+                    closeOnSelect={true}
+                  >
+                    <SelectTrigger w="60px">
+                      <SelectValueText />
+                    </SelectTrigger>
+                    <SelectPositioner w="60px">
+                      <SelectContent>
+                        <SelectItem item={{ label: "5", value: "5" }}>
+                          5
+                        </SelectItem>
+                        <SelectItem item={{ label: "10", value: "10" }}>
+                          10
+                        </SelectItem>
+                        <SelectItem item={{ label: "25", value: "25" }}>
+                          25
+                        </SelectItem>
+                      </SelectContent>
+                    </SelectPositioner>
+                  </Select.Root>
+                </HStack>
+
+                <Pagination.Root
+                  count={pagination?.totalItems || 0}
+                  pageSize={params.itemsPerPage || 10}
+                  page={pagination?.page || 1}
+                  onPageChange={(details) => handlePageChange(details.page)}
+                  siblingCount={2}
+                >
+                  <ButtonGroup variant="ghost" size="sm">
+                    <Pagination.PrevTrigger asChild>
+                      <IconButton
+                        aria-label="Página anterior"
+                        colorPalette="orange"
+                        borderRadius="md"
+                        w="36px"
+                        h="36px"
+                      >
+                        <LuChevronLeft />
+                      </IconButton>
+                    </Pagination.PrevTrigger>
+
+                    <Pagination.Items
+                      render={(page) => {
+                        const isCurrentPage =
+                          page.type === "page" &&
+                          pagination?.page === page.value;
+                        return (
+                          <Pagination.Item
+                            key={
+                              page.type === "page"
+                                ? page.value
+                                : `page-${page.value}`
+                            }
+                            value={page.value}
+                            type={page.type}
+                            aria-label={`Página ${page.value}`}
+                            w="36px"
+                            h="36px"
+                            minW="36px"
+                            p={0}
+                            borderRadius="md"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            bg={isCurrentPage ? "orange.500" : "transparent"}
+                            color={isCurrentPage ? "white" : "orange.500"}
+                            borderWidth={isCurrentPage ? "0" : "1px"}
+                            borderColor="orange.500"
+                            cursor="pointer"
+                            _hover={{
+                              bg: isCurrentPage ? "orange.600" : "orange.50",
+                            }}
+                            transition="all 0.2s"
+                          >
+                            {page.type === "page" ? page.value : "..."}
+                          </Pagination.Item>
+                        );
+                      }}
+                    />
+
+                    <Pagination.NextTrigger asChild>
+                      <IconButton
+                        aria-label="Próxima página"
+                        colorPalette="orange"
+                        borderRadius="md"
+                        w="36px"
+                        h="36px"
+                      >
+                        <LuChevronRight />
+                      </IconButton>
+                    </Pagination.NextTrigger>
+                  </ButtonGroup>
+                </Pagination.Root>
+              </Box>
+            )}
           </Box>
         )}
       </Stack>

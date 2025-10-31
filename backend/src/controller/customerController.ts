@@ -6,14 +6,22 @@ import {
   updateCustomer,
   deleteCustomer,
 } from "../services/customerService";
-import { CustomerDto } from "../types/customer";
+import { CustomerDto, GetCustomersParams } from "../types/customer";
 
 export const getAllCustomersController = async (
-  _req: Request,
+  req: Request<{}, {}, GetCustomersParams>,
   res: Response
 ) => {
+  const { page, itemsPerPage, name, orderBy, orderDirection } = req.query;
+
   try {
-    const customers = await getAllCustomers();
+    const customers = await getAllCustomers({
+      page: page ? Number(page) : undefined,
+      itemsPerPage: itemsPerPage ? Number(itemsPerPage) : undefined,
+      name: name as string,
+      orderBy: orderBy as "name" | "email" | "phone" | "updatedAt",
+      orderDirection: orderDirection as "asc" | "desc",
+    });
 
     res.status(200).json(customers);
   } catch (error) {

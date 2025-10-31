@@ -4,14 +4,26 @@ import {
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,
 } from "./api";
-import { CustomerDto } from "./types";
+import { CustomerDto, GetCustomersParams } from "./types";
 import { toaster } from "@/src/components/ui/toaster";
 
-export function useGetCustomers() {
-  const { data: customers = [], isLoading } = useGetCustomersQuery();
+export function useGetCustomers(params?: GetCustomersParams) {
+  const queryParams: GetCustomersParams = {
+    page: params?.page || 1,
+    itemsPerPage: params?.itemsPerPage || 10,
+    orderBy: params?.orderBy || "updatedAt",
+    orderDirection: params?.orderDirection || "desc",
+  };
+
+  if (params?.name) {
+    queryParams.name = params.name;
+  }
+
+  const { data, isLoading } = useGetCustomersQuery(queryParams);
 
   return {
-    customers,
+    customers: data?.data || [],
+    pagination: data?.pagination,
     isLoading,
   };
 }
