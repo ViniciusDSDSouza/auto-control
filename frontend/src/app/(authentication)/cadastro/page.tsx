@@ -22,7 +22,7 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  const { onSubmit } = UserRegisterPage();
+  const { onSubmit, isLoading } = UserRegisterPage();
 
   return (
     <Box
@@ -112,7 +112,13 @@ export default function RegisterPage() {
                 {...register("confirmPassword")}
               />
 
-              <AuthButton type="submit">Criar conta</AuthButton>
+              <AuthButton
+                type="submit"
+                loading={isLoading}
+                loadingText="Carregando..."
+              >
+                Criar conta
+              </AuthButton>
 
               <AuthLink
                 question="Já tem uma conta?"
