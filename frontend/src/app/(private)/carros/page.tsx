@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { CustomerTableSkeleton, CarFormDialog } from "@/src/components/ui";
 import { useCarsGet, useCarsEdit, useCarsDelete } from "./useCarsPage";
-import { FaPlus, FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 export default function CarrosPage() {
@@ -218,15 +218,6 @@ export default function CarrosPage() {
                       </Table.Cell>
                       <Table.Cell minW="120px">
                         <HStack gap={2} justifyContent="center">
-                          <IconButton
-                            size="sm"
-                            variant="ghost"
-                            aria-label="Visualizar"
-                            colorPalette="blue"
-                            _hover={{ bg: "transparent" }}
-                          >
-                            <FaEye />
-                          </IconButton>
                           <IconButton
                             size="sm"
                             variant="ghost"

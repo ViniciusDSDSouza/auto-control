@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { CustomerTableSkeleton, PartFormDialog } from "@/src/components/ui";
 import { usePartsGet, usePartsEdit, usePartsDelete } from "./usePartsPage";
-import { FaPlus, FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 export default function PecasPage() {
@@ -189,15 +189,6 @@ export default function PecasPage() {
                       </Table.Cell>
                       <Table.Cell minW="120px">
                         <HStack gap={2} justifyContent="center">
-                          <IconButton
-                            size="sm"
-                            variant="ghost"
-                            aria-label="Visualizar"
-                            colorPalette="blue"
-                            _hover={{ bg: "transparent" }}
-                          >
-                            <FaEye />
-                          </IconButton>
                           <IconButton
                             size="sm"
                             variant="ghost"
