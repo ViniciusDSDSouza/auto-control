@@ -4,6 +4,12 @@ export interface PartDto {
   price: number;
 }
 
+export interface Part extends PartDto {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface GetPartsParams {
   page?: number;
   itemsPerPage?: number;

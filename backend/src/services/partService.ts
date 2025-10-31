@@ -1,10 +1,54 @@
 import { prisma } from "../db/client";
-import { PartDto } from "../types/part";
+import { PartDto, GetPartsParams, PaginatedResponse } from "../types/part";
 
-export const getAllParts = async () => {
+export const getAllParts = async ({
+  page = 1,
+  itemsPerPage = 10,
+  name,
+  orderBy = "updatedAt",
+  orderDirection = "desc",
+}: GetPartsParams): Promise<PaginatedResponse<PartDto>> => {
   try {
-    const parts = await prisma.part.findMany();
-    return parts;
+    const where = name
+      ? {
+          name: {
+            contains: name,
+            mode: "insensitive" as const,
+          },
+        }
+      : {};
+
+    const total = await prisma.part.count({ where });
+
+    const parts = await prisma.part.findMany({
+      skip: (page - 1) * itemsPerPage,
+      take: itemsPerPage,
+      orderBy: {
+        [orderBy]: orderDirection,
+      },
+      where,
+    });
+
+    const totalPages = Math.ceil(total / itemsPerPage);
+
+    return {
+      data: parts.map((part) => ({
+        id: part.id,
+        name: part.name,
+        model: part.model,
+        price: part.price,
+        createdAt: part.createdAt.toISOString(),
+        updatedAt: part.updatedAt.toISOString(),
+      })),
+      pagination: {
+        page,
+        itemsPerPage,
+        totalItems: total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to get all parts");

@@ -6,11 +6,23 @@ import {
   updatePart,
   deletePart,
 } from "../services/partService";
-import { PartDto } from "../types/part";
+import { PartDto, GetPartsParams } from "../types/part";
 
-export const getAllPartsController = async (_req: Request, res: Response) => {
+export const getAllPartsController = async (
+  req: Request<{}, {}, GetPartsParams>,
+  res: Response
+) => {
+  const { page, itemsPerPage, name, orderBy, orderDirection } = req.query;
+
   try {
-    const parts = await getAllParts();
+    const parts = await getAllParts({
+      page: page ? Number(page) : undefined,
+      itemsPerPage: itemsPerPage ? Number(itemsPerPage) : undefined,
+      name: name as string,
+      orderBy: orderBy as "name" | "model" | "price" | "updatedAt",
+      orderDirection: orderDirection as "asc" | "desc",
+    });
+
     res.status(200).json(parts);
   } catch (error) {
     console.error(error);
