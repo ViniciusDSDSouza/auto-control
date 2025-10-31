@@ -5,6 +5,8 @@ import {
   useCreateCustomer,
   useUpdateCustomer,
 } from "@/src/modules/customer/hooks";
+import { Customer } from "@/src/modules/customer/types";
+import { CustomerSchema } from "@/src/modules/customer/schema";
 
 export function useCustomersPage() {
   const { customers, isLoading: isLoadingCustomers } = useGetCustomers();
@@ -16,6 +18,8 @@ export function useCustomersPage() {
     id: string;
     name: string;
   } | null>(null);
+  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   const filteredCustomers = useMemo(
     () =>
@@ -44,6 +48,29 @@ export function useCustomersPage() {
     setDeleteConfirm(null);
   };
 
+  const handleOpenCreateDialog = () => {
+    setEditingCustomer(null);
+    setIsCustomerDialogOpen(true);
+  };
+
+  const handleOpenEditDialog = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setIsCustomerDialogOpen(true);
+  };
+
+  const handleCloseCustomerDialog = () => {
+    setIsCustomerDialogOpen(false);
+    setEditingCustomer(null);
+  };
+
+  const handleCustomerSubmit = async (data: CustomerSchema) => {
+    if (editingCustomer) {
+      await handleUpdateCustomer(editingCustomer.id, data);
+    } else {
+      await handleCreateCustomer(data);
+    }
+  };
+
   return {
     customers: filteredCustomers,
     isLoadingCustomers,
@@ -53,5 +80,12 @@ export function useCustomersPage() {
     handleDeleteClick,
     handleDeleteConfirm,
     handleCloseDeleteDialog,
+    isCustomerDialogOpen,
+    editingCustomer,
+    handleOpenCreateDialog,
+    handleOpenEditDialog,
+    handleCloseCustomerDialog,
+    handleCustomerSubmit,
+    isSavingCustomer: isCreating || isUpdating,
   };
 }

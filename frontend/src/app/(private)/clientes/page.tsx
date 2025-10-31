@@ -13,7 +13,7 @@ import {
   Dialog,
   Text,
 } from "@chakra-ui/react";
-import { CustomerTableSkeleton } from "@/src/components/ui";
+import { CustomerTableSkeleton, CustomerFormDialog } from "@/src/components/ui";
 import { useCustomersPage } from "./useCustomersPage";
 import { FaPlus, FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 
@@ -27,6 +27,13 @@ export default function ClientesPage() {
     handleDeleteClick,
     handleDeleteConfirm,
     handleCloseDeleteDialog,
+    isCustomerDialogOpen,
+    editingCustomer,
+    handleOpenCreateDialog,
+    handleOpenEditDialog,
+    handleCloseCustomerDialog,
+    handleCustomerSubmit,
+    isSavingCustomer,
   } = useCustomersPage();
 
   return (
@@ -65,7 +72,12 @@ export default function ClientesPage() {
               borderRadius="lg"
             />
           </InputGroup>
-          <Button colorPalette="orange" size="lg" borderRadius="lg">
+          <Button
+            colorPalette="orange"
+            size="lg"
+            borderRadius="lg"
+            onClick={handleOpenCreateDialog}
+          >
             <FaPlus style={{ marginRight: "8px" }} />
             Cadastrar Cliente
           </Button>
@@ -163,6 +175,7 @@ export default function ClientesPage() {
                             variant="ghost"
                             aria-label="Editar"
                             colorPalette="orange"
+                            onClick={() => handleOpenEditDialog(customer)}
                             _hover={{ bg: "transparent" }}
                           >
                             <FaEdit />
@@ -229,6 +242,14 @@ export default function ClientesPage() {
           </Dialog.Content>
         </Dialog.Positioner>
       </Dialog.Root>
+
+      <CustomerFormDialog
+        isOpen={isCustomerDialogOpen}
+        onClose={handleCloseCustomerDialog}
+        onSubmit={handleCustomerSubmit}
+        customer={editingCustomer}
+        isLoading={isSavingCustomer}
+      />
     </Box>
   );
 }
