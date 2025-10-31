@@ -6,3 +6,4 @@ export { PasswordInput } from "./PasswordInput";
 export { AuthButton } from "./AuthButton";
 export { AuthLink } from "./AuthLink";
 export { Provider } from "./provider";
+export { CustomerTableSkeleton } from "./CustomerTableSkeleton";

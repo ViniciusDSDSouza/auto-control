@@ -6,84 +6,28 @@ import {
   Input,
   Button,
   Table,
-  Skeleton,
   HStack,
   IconButton,
   InputGroup,
   Icon,
+  Dialog,
+  Text,
 } from "@chakra-ui/react";
-import {
-  useGetCustomersQuery,
-  useDeleteCustomerMutation,
-} from "@/src/modules/customer/api";
-import { useState } from "react";
+import { CustomerTableSkeleton } from "@/src/components/ui";
+import { useCustomersPage } from "./useCustomersPage";
 import { FaPlus, FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
-import { toaster } from "@/src/components/ui/toaster";
-
-const TableSkeleton = () => (
-  <Box
-    borderWidth="1px"
-    borderRadius="xl"
-    overflowX="auto"
-    bg="white"
-    shadow="sm"
-  >
-    <Table.Root>
-      <Table.Header>
-        <Table.Row>
-          <Table.ColumnHeader minW="200px">Cliente</Table.ColumnHeader>
-          <Table.ColumnHeader minW="180px">Email</Table.ColumnHeader>
-          <Table.ColumnHeader minW="140px">Telefone</Table.ColumnHeader>
-          <Table.ColumnHeader minW="120px">Ações</Table.ColumnHeader>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {[...Array(5)].map((_, index) => (
-          <Table.Row key={index}>
-            <Table.Cell minW="200px">
-              <Skeleton height="20px" borderRadius="md" />
-            </Table.Cell>
-            <Table.Cell minW="180px">
-              <Skeleton height="20px" borderRadius="md" />
-            </Table.Cell>
-            <Table.Cell minW="140px">
-              <Skeleton height="20px" borderRadius="md" />
-            </Table.Cell>
-            <Table.Cell minW="120px">
-              <Skeleton height="20px" borderRadius="md" />
-            </Table.Cell>
-          </Table.Row>
-        ))}
-      </Table.Body>
-    </Table.Root>
-  </Box>
-);
 
 export default function ClientesPage() {
-  const { data: customers = [], isLoading } = useGetCustomersQuery();
-  const [deleteCustomer] = useDeleteCustomerMutation();
-  const [search, setSearch] = useState("");
-
-  const filteredCustomers = customers.filter((customer) =>
-    customer.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleDelete = async (id: string, name: string) => {
-    try {
-      await deleteCustomer(id).unwrap();
-      toaster.create({
-        title: "Cliente excluído!",
-        description: `${name} foi removido com sucesso.`,
-        type: "success",
-      });
-    } catch {
-      toaster.create({
-        title: "Erro ao excluir cliente!",
-        description: "Por favor, tente novamente.",
-        type: "error",
-      });
-    }
-  };
+  const {
+    customers,
+    isLoadingCustomers,
+    search,
+    setSearch,
+    deleteConfirm,
+    handleDeleteClick,
+    handleDeleteConfirm,
+    handleCloseDeleteDialog,
+  } = useCustomersPage();
 
   return (
     <Box>
@@ -127,8 +71,8 @@ export default function ClientesPage() {
           </Button>
         </HStack>
 
-        {isLoading ? (
-          <TableSkeleton />
+        {isLoadingCustomers ? (
+          <CustomerTableSkeleton />
         ) : (
           <Box
             borderWidth="1px"
@@ -180,7 +124,7 @@ export default function ClientesPage() {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {filteredCustomers.length === 0 ? (
+                {customers.length === 0 ? (
                   <Table.Row>
                     <Table.Cell
                       colSpan={4}
@@ -192,7 +136,7 @@ export default function ClientesPage() {
                     </Table.Cell>
                   </Table.Row>
                 ) : (
-                  filteredCustomers.map((customer) => (
+                  customers.map((customer) => (
                     <Table.Row key={customer.id} _hover={{ bg: "orange.50" }}>
                       <Table.Cell fontSize="lg" minW="200px">
                         {customer.name}
@@ -229,7 +173,7 @@ export default function ClientesPage() {
                             aria-label="Excluir"
                             colorPalette="red"
                             onClick={() =>
-                              handleDelete(customer.id, customer.name)
+                              handleDeleteClick(customer.id, customer.name)
                             }
                             _hover={{ bg: "transparent" }}
                           >
@@ -245,6 +189,46 @@ export default function ClientesPage() {
           </Box>
         )}
       </Stack>
+
+      <Dialog.Root
+        open={!!deleteConfirm}
+        onOpenChange={(e) => {
+          if (!e.open) handleCloseDeleteDialog();
+        }}
+      >
+        <Dialog.Backdrop />
+        <Dialog.Positioner
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Dialog.Content>
+            <Dialog.CloseTrigger />
+            <Dialog.Header>
+              <Text fontSize="xl" fontWeight="bold">
+                Confirmar exclusão
+              </Text>
+            </Dialog.Header>
+            <Dialog.Body>
+              <Text>
+                Tem certeza que deseja excluir o cliente{" "}
+                <strong>{deleteConfirm?.name}</strong>? Esta ação não pode ser
+                desfeita.
+              </Text>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <HStack gap={3}>
+                <Button variant="ghost" onClick={handleCloseDeleteDialog}>
+                  Cancelar
+                </Button>
+                <Button colorPalette="red" onClick={handleDeleteConfirm}>
+                  Excluir
+                </Button>
+              </HStack>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
     </Box>
   );
 }

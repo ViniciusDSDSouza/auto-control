@@ -195,6 +195,7 @@ export function Sidebar() {
 
   return (
     <Box
+      suppressHydrationWarning
       position="fixed"
       top={0}
       left={0}
