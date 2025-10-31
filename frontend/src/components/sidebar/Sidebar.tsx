@@ -20,7 +20,7 @@ export function Sidebar() {
   const { open, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
   const router = useRouter();
-  const isMobile = useBreakpointValue({ base: true, md: false });
+  const isMobile = useBreakpointValue({ base: true, lg: false });
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -31,17 +31,17 @@ export function Sidebar() {
     <Stack
       h="100vh"
       bg="orange.500"
-      w={{ base: "280px", md: "260px" }}
+      w={{ base: "280px", lg: "260px" }}
       gap={0}
       position="relative"
-      borderRadius={{ base: "0", md: "0 20px 20px 0" }}
+      borderRadius={{ base: "0", lg: "0 20px 20px 0" }}
       overflow="hidden"
     >
       <Box
         display="flex"
         alignItems="center"
         justifyContent="center"
-        borderRadius={{ base: "0", md: "20px 0 0 0" }}
+        borderRadius={{ base: "0", lg: "20px 0 0 0" }}
         position="relative"
         py={6}
       >
@@ -113,7 +113,7 @@ export function Sidebar() {
         </Stack>
       </Box>
 
-      <Box p={4} borderRadius={{ base: "0", md: "0 0 20px 0" }}>
+      <Box p={4} borderRadius={{ base: "0", lg: "0 0 20px 0" }}>
         <Button
           variant="outline"
           size="md"

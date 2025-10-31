@@ -24,8 +24,8 @@ export default function PrivateLayout({
     <>
       <Sidebar />
       <Box
-        ml={{ base: 0, md: "260px" }}
-        pt={{ base: 28, md: 6 }}
+        ml={{ base: 0, lg: "260px" }}
+        pt={{ base: 28, lg: 6 }}
         px={6}
         pb={6}
         minH="100vh"

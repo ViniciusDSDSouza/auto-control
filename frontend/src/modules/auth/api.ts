@@ -3,6 +3,7 @@ import { baseQuery } from "@/src/store/baseQuery";
 import { RegisterUserDto, LoginUserDto, LoginUserResponse } from "./types";
 
 export const authApi = createApi({
+  reducerPath: "authApi",
   baseQuery,
   endpoints: (builder) => ({
     registerUser: builder.mutation<void, RegisterUserDto>({
