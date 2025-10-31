@@ -26,5 +26,17 @@ services:
       - db
     command: npm run dev
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: auto-control-frontend
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+    command: npm run dev
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 volumes:
   pgdata:
