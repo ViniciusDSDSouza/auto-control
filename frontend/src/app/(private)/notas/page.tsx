@@ -19,12 +19,19 @@ import {
   createListCollection,
   Pagination,
   ButtonGroup,
+  Popover,
+  Portal,
 } from "@chakra-ui/react";
 import { NoteFormDialog } from "@/src/components/ui/NoteFormDialog";
 import { useNotesGet, useNotesEdit, useNotesDelete } from "./useNotesPage";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaCalendar } from "react-icons/fa";
 import { NoteStatus } from "@/src/modules/note/types";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { DateRangePicker } from "@/src/components/ui/dateRangePicker/DateRangePicker";
+import { DateRange } from "react-day-picker";
+import { useState } from "react";
+import { formatDate, formatDateRange } from "@/src/libs/formatDate";
+import { formatCurrency } from "@/src/libs/formatCurrency";
 
 function getStatusBadgeColor(status: NoteStatus) {
   switch (status) {
@@ -53,6 +60,8 @@ function getStatusLabel(status: NoteStatus) {
 }
 
 export default function NotasPage() {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
   const {
     notes,
     pagination,
@@ -79,21 +88,6 @@ export default function NotasPage() {
     isSavingNote,
   } = useNotesEdit();
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(new Date(dateString));
-  };
-
   return (
     <Box>
       <Stack gap={6}>
@@ -113,6 +107,32 @@ export default function NotasPage() {
         </Box>
 
         <HStack gap={3} alignItems="center" justifyContent="space-between">
+          <Popover.Root id="date-range-picker">
+            <Popover.Trigger asChild w={280}>
+              <Button colorPalette="orange" size="lg">
+                <FaCalendar />
+                <Text ml={2}>
+                  {dateRange
+                    ? formatDateRange(dateRange)
+                    : "Selecionar período"}
+                </Text>
+              </Button>
+            </Popover.Trigger>
+            <Portal>
+              <Popover.Positioner>
+                <Popover.Content>
+                  <DateRangePicker
+                    defaultDateRange={dateRange}
+                    onDateRangeChange={(dateRange) => {
+                      setDateRange(dateRange);
+                      console.log(dateRange);
+                    }}
+                  />
+                </Popover.Content>
+              </Popover.Positioner>
+            </Portal>
+          </Popover.Root>
+
           <Box flex={1} />
           <Button
             colorPalette="orange"
