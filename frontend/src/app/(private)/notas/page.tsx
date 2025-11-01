@@ -25,39 +25,13 @@ import {
 import { NoteFormDialog, CustomerTableSkeleton } from "@/src/components/ui";
 import { useNotesGet, useNotesEdit, useNotesDelete } from "./useNotesPage";
 import { FaPlus, FaEdit, FaTrash, FaCalendar } from "react-icons/fa";
-import { NoteStatus } from "@/src/modules/note/types";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { DateRangePicker } from "@/src/components/ui/dateRangePicker/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { useState } from "react";
 import { formatDate, formatDateRange } from "@/src/libs/formatDate";
 import { formatCurrency } from "@/src/libs/formatCurrency";
-
-function getStatusBadgeColor(status: NoteStatus) {
-  switch (status) {
-    case NoteStatus.OPEN:
-      return "yellow";
-    case NoteStatus.PAID:
-      return "green";
-    case NoteStatus.CANCELLED:
-      return "red";
-    default:
-      return "gray";
-  }
-}
-
-function getStatusLabel(status: NoteStatus) {
-  switch (status) {
-    case NoteStatus.OPEN:
-      return "Aberta";
-    case NoteStatus.PAID:
-      return "Paga";
-    case NoteStatus.CANCELLED:
-      return "Cancelada";
-    default:
-      return status;
-  }
-}
+import { getStatusBadgeColor, getStatusLabel } from "@/src/libs/noteStatus";
 
 export default function NotasPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);

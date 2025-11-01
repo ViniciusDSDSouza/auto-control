@@ -30,8 +30,11 @@ import {
 } from "./useCustomersPage";
 import { FaPlus, FaEye, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 
 export default function ClientesPage() {
+  const router = useRouter();
+
   const {
     customers,
     pagination,
@@ -193,7 +196,11 @@ export default function ClientesPage() {
                             colorPalette="blue"
                             _hover={{ bg: "transparent" }}
                           >
-                            <FaEye />
+                            <FaEye
+                              onClick={() =>
+                                router.push(`/clientes/${customer.id}`)
+                              }
+                            />
                           </IconButton>
                           <IconButton
                             size="sm"

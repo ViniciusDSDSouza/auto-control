@@ -8,6 +8,36 @@ export interface Customer extends CustomerDto {
   id: string;
   createdAt: string;
   updatedAt: string;
+  cars?: Array<{
+    id: string;
+    customerId: string;
+    brand: string;
+    model: string;
+    plate?: string;
+    year?: number;
+    color: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  notes?: Array<{
+    id: string;
+    customerId: string;
+    carId: string;
+    laborPrice: number;
+    partsPrice: number;
+    totalPrice: number;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    car?: {
+      id: string;
+      brand: string;
+      model: string;
+      plate?: string;
+      year?: number;
+      color: string;
+    };
+  }>;
 }
 
 export interface GetCustomersParams {
