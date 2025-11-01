@@ -34,6 +34,18 @@ export function useNotesGet() {
     }));
   };
 
+  const handleDateRangeChange = (
+    dateRangeFrom?: string,
+    dateRangeTo?: string
+  ) => {
+    setParams((prev) => ({
+      ...prev,
+      page: 1,
+      dateRangeFrom,
+      dateRangeTo,
+    }));
+  };
+
   return {
     notes,
     pagination,
@@ -41,6 +53,7 @@ export function useNotesGet() {
     params,
     handlePageChange,
     handleItemsPerPageChange,
+    handleDateRangeChange,
   };
 }
 

@@ -69,6 +69,7 @@ export default function NotasPage() {
     params,
     handlePageChange,
     handleItemsPerPageChange,
+    handleDateRangeChange,
   } = useNotesGet();
 
   const {
@@ -120,12 +121,15 @@ export default function NotasPage() {
             </Popover.Trigger>
             <Portal>
               <Popover.Positioner>
-                <Popover.Content>
+                <Popover.Content className="translate-x-[5%]">
                   <DateRangePicker
                     defaultDateRange={dateRange}
-                    onDateRangeChange={(dateRange) => {
-                      setDateRange(dateRange);
-                      console.log(dateRange);
+                    onDateRangeChange={(newDateRange) => {
+                      setDateRange(newDateRange);
+                      handleDateRangeChange(
+                        newDateRange?.from?.toISOString(),
+                        newDateRange?.to?.toISOString()
+                      );
                     }}
                   />
                 </Popover.Content>

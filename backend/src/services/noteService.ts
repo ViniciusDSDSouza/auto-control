@@ -13,6 +13,8 @@ export const getAllNotes = async ({
   customerId,
   carId,
   status,
+  dateRangeFrom,
+  dateRangeTo,
   orderBy = "updatedAt",
   orderDirection = "desc",
 }: GetNotesParams): Promise<PaginatedResponse<Note>> => {
@@ -27,6 +29,17 @@ export const getAllNotes = async ({
     }
     if (status) {
       where.status = status;
+    }
+    if (dateRangeFrom || dateRangeTo) {
+      where.createdAt = {};
+      if (dateRangeFrom) {
+        where.createdAt.gte = new Date(dateRangeFrom);
+      }
+      if (dateRangeTo) {
+        const endDate = new Date(dateRangeTo);
+        endDate.setDate(endDate.getDate() + 1);
+        where.createdAt.lte = endDate;
+      }
     }
 
     const total = await prisma.note.count({ where });

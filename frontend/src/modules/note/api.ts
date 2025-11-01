@@ -16,6 +16,9 @@ export const noteApi = createApi({
         if (params.customerId) queryParams.customerId = params.customerId;
         if (params.carId) queryParams.carId = params.carId;
         if (params.status) queryParams.status = params.status;
+        if (params.dateRangeFrom)
+          queryParams.dateRangeFrom = params.dateRangeFrom;
+        if (params.dateRangeTo) queryParams.dateRangeTo = params.dateRangeTo;
         if (params.orderBy) queryParams.orderBy = params.orderBy;
         if (params.orderDirection)
           queryParams.orderDirection = params.orderDirection;

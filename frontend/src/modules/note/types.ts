@@ -67,6 +67,8 @@ export interface GetNotesParams {
   customerId?: string;
   carId?: string;
   status?: NoteStatus;
+  dateRangeFrom?: string;
+  dateRangeTo?: string;
   orderBy?:
     | "customerId"
     | "carId"

@@ -24,6 +24,12 @@ export function useGetNotes(params?: GetNotesParams) {
   if (params?.status) {
     queryParams.status = params.status;
   }
+  if (params?.dateRangeFrom) {
+    queryParams.dateRangeFrom = params.dateRangeFrom;
+  }
+  if (params?.dateRangeTo) {
+    queryParams.dateRangeTo = params.dateRangeTo;
+  }
 
   const { data, isLoading } = useGetNotesQuery(queryParams);
 

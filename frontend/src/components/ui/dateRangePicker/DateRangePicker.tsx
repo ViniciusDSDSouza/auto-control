@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/style.css";
 import "./style.css";
@@ -13,22 +12,16 @@ export function DateRangePicker({
   defaultDateRange,
   onDateRangeChange,
 }: DateRangePickerProps) {
-  const [selectedDate, setSelectedDate] = useState<DateRange | undefined>(
-    defaultDateRange
-  );
-
-  useEffect(() => {
-    if (onDateRangeChange) {
-      onDateRangeChange(selectedDate);
-    }
-  }, [selectedDate, onDateRangeChange]);
+  const handleSelect = (range: DateRange | undefined) => {
+    onDateRangeChange(range);
+  };
 
   return (
     <DayPicker
       mode="range"
-      selected={selectedDate}
+      selected={defaultDateRange}
       locale={ptBR}
-      onSelect={setSelectedDate}
+      onSelect={handleSelect}
     />
   );
 }

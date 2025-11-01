@@ -17,6 +17,8 @@ export const getAllNotesController = async (req: Request, res: Response) => {
       customerId,
       carId,
       status,
+      dateRangeFrom,
+      dateRangeTo,
       orderBy,
       orderDirection,
     } = req.query;
@@ -28,6 +30,8 @@ export const getAllNotesController = async (req: Request, res: Response) => {
     if (customerId) params.customerId = customerId as string;
     if (carId) params.carId = carId as string;
     if (status) params.status = status as NoteStatus;
+    if (dateRangeFrom) params.dateRangeFrom = dateRangeFrom as string;
+    if (dateRangeTo) params.dateRangeTo = dateRangeTo as string;
     if (orderBy) params.orderBy = orderBy as GetNotesParams["orderBy"];
     if (orderDirection)
       params.orderDirection = orderDirection as "asc" | "desc";
