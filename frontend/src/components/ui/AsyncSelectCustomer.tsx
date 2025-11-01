@@ -2,7 +2,7 @@
 
 import { AsyncPaginate } from "react-select-async-paginate";
 import { GroupBase, OptionsOrGroups } from "react-select";
-import { useMemo } from "react";
+import { useMemo, useEffect, useCallback, useRef } from "react";
 import { useGetCustomerByIdQuery } from "@/src/modules/customer/api";
 import type { Customer } from "@/src/modules/customer/types";
 
@@ -28,6 +28,9 @@ export function AsyncSelectCustomer({
     skip: !value,
   });
 
+  // const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const selectedCustomer = useMemo<SelectOption | null>(() => {
     if (customerData && value && customerData.id === value) {
       return {
@@ -38,63 +41,98 @@ export function AsyncSelectCustomer({
     return null;
   }, [customerData, value]);
 
-  const loadOptions = async (
-    searchQuery: string,
-    _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
-    additional?: { page: number }
-  ) => {
-    const page = additional?.page || 1;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-    const token = localStorage.getItem("token");
+  const fetchCustomers = useCallback(
+    async (
+      searchQuery: string,
+      _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
+      additional?: { page: number }
+    ) => {
+      const page = additional?.page || 1;
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      const token = localStorage.getItem("token");
 
-    if (!baseUrl) {
-      throw new Error("URL da API não configurada");
-    }
+      if (!baseUrl) {
+        throw new Error("URL da API não configurada");
+      }
 
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      itemsPerPage: "4",
-      orderBy: "name",
-      orderDirection: "asc",
-    });
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        itemsPerPage: "4",
+        orderBy: "name",
+        orderDirection: "asc",
+      });
 
-    if (searchQuery) {
-      queryParams.append("name", searchQuery);
-    }
+      if (searchQuery) {
+        queryParams.append("name", searchQuery);
+      }
 
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${baseUrl}/customers?${queryParams}`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar clientes");
+      }
+
+      const data = await response.json();
+      const customers: Customer[] = data.data || [];
+      const pagination = data.pagination;
+
+      const options: SelectOption[] = customers.map((customer) => ({
+        value: customer.id,
+        label: customer.name,
+      }));
+
+      return {
+        options,
+        hasMore: pagination?.hasNext || false,
+        additional: {
+          page: page + 1,
+        },
+      };
+    },
+    []
+  );
+
+  const loadOptions = useCallback(
+    async (
+      searchQuery: string,
+      _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
+      additional?: { page: number }
+    ) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      return new Promise<{
+        options: SelectOption[];
+        hasMore: boolean;
+        additional: { page: number };
+      }>((resolve) => {
+        debounceTimerRef.current = setTimeout(() => {
+          // setDebouncedSearchQuery(searchQuery);
+          fetchCustomers(searchQuery, _, additional).then(resolve);
+        }, 500);
+      });
+    },
+    [fetchCustomers]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${baseUrl}/customers?${queryParams}`, {
-      headers,
-    });
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar clientes");
-    }
-
-    const data = await response.json();
-    const customers: Customer[] = data.data || [];
-    const pagination = data.pagination;
-
-    const options: SelectOption[] = customers.map((customer) => ({
-      value: customer.id,
-      label: customer.name,
-    }));
-
-    return {
-      options,
-      hasMore: pagination?.hasNext || false,
-      additional: {
-        page: page + 1,
-      },
-    };
-  };
+  }, []);
 
   return (
     <AsyncPaginate
@@ -107,6 +145,10 @@ export function AsyncSelectCustomer({
       placeholder={placeholder}
       isSearchable
       isClearable
+      loadingMessage={() => "Carregando..."}
+      noOptionsMessage={({ inputValue }) =>
+        inputValue ? "Nenhum cliente encontrado" : "Digite para buscar clientes"
+      }
       additional={{
         page: 1,
       }}

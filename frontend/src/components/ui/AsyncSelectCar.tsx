@@ -2,7 +2,7 @@
 
 import { AsyncPaginate } from "react-select-async-paginate";
 import { GroupBase, OptionsOrGroups } from "react-select";
-import { useMemo } from "react";
+import { useMemo, useEffect, useCallback, useRef } from "react";
 import { useGetCarByIdQuery } from "@/src/modules/car/api";
 import type { Car } from "@/src/modules/car/types";
 
@@ -30,6 +30,8 @@ export function AsyncSelectCar({
     skip: !value,
   });
 
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const selectedCar = useMemo<SelectOption | null>(() => {
     if (carData && value && carData.id === value) {
       return {
@@ -42,67 +44,101 @@ export function AsyncSelectCar({
     return null;
   }, [carData, value]);
 
-  const loadOptions = async (
-    searchQuery: string,
-    _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
-    additional?: { page: number }
-  ) => {
-    const page = additional?.page || 1;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-    const token = localStorage.getItem("token");
+  const fetchCars = useCallback(
+    async (
+      searchQuery: string,
+      _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
+      additional?: { page: number }
+    ) => {
+      const page = additional?.page || 1;
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      const token = localStorage.getItem("token");
 
-    if (!baseUrl) {
-      throw new Error("URL da API não configurada");
-    }
+      if (!baseUrl) {
+        throw new Error("URL da API não configurada");
+      }
 
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      itemsPerPage: "4",
-      orderBy: "brand",
-      orderDirection: "asc",
-    });
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        itemsPerPage: "4",
+        orderBy: "brand",
+        orderDirection: "asc",
+      });
 
-    if (customerId) {
-      queryParams.append("customerId", customerId);
-    }
+      if (customerId) {
+        queryParams.append("customerId", customerId);
+      }
 
-    if (searchQuery) {
-      queryParams.append("brand", searchQuery);
-    }
+      if (searchQuery) {
+        queryParams.append("brand", searchQuery);
+      }
 
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${baseUrl}/cars?${queryParams}`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar carros");
+      }
+
+      const data = await response.json();
+      const cars: Car[] = data.data || [];
+      const pagination = data.pagination;
+
+      const options: SelectOption[] = cars.map((car) => ({
+        value: car.id,
+        label: `${car.brand} ${car.model}${car.plate ? ` - ${car.plate}` : ""}`,
+      }));
+
+      return {
+        options,
+        hasMore: pagination?.hasNext || false,
+        additional: {
+          page: page + 1,
+        },
+      };
+    },
+    [customerId]
+  );
+
+  const loadOptions = useCallback(
+    async (
+      searchQuery: string,
+      _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
+      additional?: { page: number }
+    ) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      return new Promise<{
+        options: SelectOption[];
+        hasMore: boolean;
+        additional: { page: number };
+      }>((resolve) => {
+        debounceTimerRef.current = setTimeout(() => {
+          fetchCars(searchQuery, _, additional).then(resolve);
+        }, 500);
+      });
+    },
+    [fetchCars]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${baseUrl}/cars?${queryParams}`, {
-      headers,
-    });
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar carros");
-    }
-
-    const data = await response.json();
-    const cars: Car[] = data.data || [];
-    const pagination = data.pagination;
-
-    const options: SelectOption[] = cars.map((car) => ({
-      value: car.id,
-      label: `${car.brand} ${car.model}${car.plate ? ` - ${car.plate}` : ""}`,
-    }));
-
-    return {
-      options,
-      hasMore: pagination?.hasNext || false,
-      additional: {
-        page: page + 1,
-      },
-    };
-  };
+  }, []);
 
   return (
     <AsyncPaginate
@@ -115,6 +151,10 @@ export function AsyncSelectCar({
       placeholder={placeholder}
       isSearchable
       isClearable
+      loadingMessage={() => "Carregando..."}
+      noOptionsMessage={({ inputValue }) =>
+        inputValue ? "Nenhum carro encontrado" : "Digite para buscar carros"
+      }
       additional={{
         page: 1,
       }}

@@ -48,8 +48,8 @@ export function useCreateNote() {
       const response = await createNote(data).unwrap();
 
       toaster.create({
-        title: "Nota cadastrada com sucesso!",
-        description: `Nota #${response.id.slice(0, 8)} foi criada.`,
+        title: "Sucesso!",
+        description: "Nota cadastrada com sucesso.",
         type: "success",
         duration: 5000,
       });
@@ -60,7 +60,7 @@ export function useCreateNote() {
         (error as { data?: { message?: string } })?.data?.message ||
         "Erro desconhecido ao cadastrar nota";
       toaster.create({
-        title: "Erro ao cadastrar nota!",
+        title: "Erro!",
         description: errorMessage,
         type: "error",
         duration: 5000,
@@ -84,8 +84,8 @@ export function useUpdateNote() {
       const response = await updateNote({ id, data }).unwrap();
 
       toaster.create({
-        title: "Nota atualizada com sucesso!",
-        description: `Nota #${response.id.slice(0, 8)} foi atualizada.`,
+        title: "Sucesso!",
+        description: "Nota atualizada com sucesso.",
         type: "success",
         duration: 5000,
       });
@@ -96,7 +96,7 @@ export function useUpdateNote() {
         (error as { data?: { message?: string } })?.data?.message ||
         "Erro desconhecido ao atualizar nota";
       toaster.create({
-        title: "Erro ao atualizar nota!",
+        title: "Erro!",
         description: errorMessage,
         type: "error",
         duration: 5000,

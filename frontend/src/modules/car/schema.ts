@@ -6,23 +6,24 @@ export const carSchema = z.object({
   model: z.string().min(1, { message: "Modelo é obrigatório" }),
   plate: z.string().optional(),
   year: z
-    .number()
-    .int({ message: "Ano deve ser um número inteiro" })
-    .refine(
+    .preprocess(
       (val) => {
-        if (val === undefined || val === null || val === 0) return true;
-        const yearStr = String(val);
-        return (
-          yearStr.length === 4 &&
-          val >= 1900 &&
-          val <= new Date().getFullYear() + 1
-        );
+        if (val === "" || val === null || val === undefined) return undefined;
+        const num = Number(val);
+        return isNaN(num) ? undefined : num;
       },
-      {
-        message: `Ano deve ter exatamente 4 dígitos e estar entre 1900 e ${
-          new Date().getFullYear() + 1
-        }`,
-      }
+      z
+        .number({ message: "Ano deve ser um número válido" })
+        .int({ message: "Ano deve ser um número inteiro" })
+        .refine((val) => !isNaN(val), {
+          message: "Ano deve ser um número válido",
+        })
+        .refine((val) => val >= 1900 && val <= new Date().getFullYear() + 1, {
+          message: `Ano deve estar entre 1900 e ${
+            new Date().getFullYear() + 1
+          }`,
+        })
+        .optional()
     )
     .optional(),
   color: z.string().min(1, { message: "Cor é obrigatória" }),

@@ -404,7 +404,11 @@ export default function NotasPage() {
         onOpenChange={(e) => !e.open && handleCloseDeleteDialog()}
       >
         <Dialog.Backdrop />
-        <Dialog.Positioner>
+        <Dialog.Positioner
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
           <Dialog.Content>
             <Dialog.Header>
               <Text fontSize="xl" fontWeight="bold">

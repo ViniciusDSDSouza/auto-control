@@ -1,9 +1,10 @@
 "use client";
 
 import { Dialog, Stack, Button, Text, HStack } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInput } from "./FormInput";
+import { CurrencyInput } from "./CurrencyInput";
 import { partSchema, PartSchema } from "@/src/modules/part/schema";
 import { Part } from "@/src/modules/part/types";
 
@@ -25,6 +26,7 @@ export function PartFormDialog({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<PartSchema>({
     resolver: zodResolver(partSchema),
@@ -88,14 +90,17 @@ export function PartFormDialog({
                   {...register("model")}
                 />
 
-                <FormInput
-                  label="Preço"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  placeholder="Digite o preço"
-                  error={errors.price?.message}
-                  {...register("price", { valueAsNumber: true })}
+                <Controller
+                  name="price"
+                  control={control}
+                  render={({ field }) => (
+                    <CurrencyInput
+                      label="Preço"
+                      value={field.value}
+                      onChange={(value) => field.onChange(value)}
+                      error={errors.price?.message}
+                    />
+                  )}
                 />
               </Stack>
             </form>

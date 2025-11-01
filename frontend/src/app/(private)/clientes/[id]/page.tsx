@@ -393,14 +393,19 @@ export default function ClientesOverviewPage() {
                     ) : (
                       cars.map((car) => (
                         <Table.Row key={car.id} _hover={{ bg: "orange.50" }}>
-                          <Table.Cell fontSize="lg" minW="120px" pl={4} py={4}>
+                          <Table.Cell
+                            fontSize="lg"
+                            minW="120px"
+                            pl={4}
+                            h="61px"
+                          >
                             {car.brand}
                           </Table.Cell>
                           <Table.Cell
                             fontSize="lg"
                             color="gray.600"
                             minW="120px"
-                            py={4}
+                            h="61px"
                           >
                             {car.model}
                           </Table.Cell>
@@ -408,7 +413,7 @@ export default function ClientesOverviewPage() {
                             fontSize="lg"
                             color="gray.600"
                             minW="100px"
-                            py={4}
+                            h="61px"
                           >
                             {car.plate || "-"}
                           </Table.Cell>
@@ -416,7 +421,7 @@ export default function ClientesOverviewPage() {
                             fontSize="lg"
                             color="gray.600"
                             minW="80px"
-                            py={4}
+                            h="61px"
                           >
                             {car.year || "-"}
                           </Table.Cell>
@@ -424,7 +429,7 @@ export default function ClientesOverviewPage() {
                             fontSize="lg"
                             color="gray.600"
                             minW="100px"
-                            py={4}
+                            h="61px"
                           >
                             {car.color}
                           </Table.Cell>

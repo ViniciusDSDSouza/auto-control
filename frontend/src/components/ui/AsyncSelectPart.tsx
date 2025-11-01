@@ -2,7 +2,7 @@
 
 import { AsyncPaginate } from "react-select-async-paginate";
 import { GroupBase, OptionsOrGroups } from "react-select";
-import { useMemo } from "react";
+import { useMemo, useEffect, useCallback, useRef } from "react";
 import { useGetPartByIdQuery } from "@/src/modules/part/api";
 import type { Part } from "@/src/modules/part/types";
 
@@ -29,6 +29,8 @@ export function AsyncSelectPart({
     skip: !value,
   });
 
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const selectedPart = useMemo<SelectOption | null>(() => {
     if (partData && value && partData.id === value) {
       return {
@@ -40,64 +42,98 @@ export function AsyncSelectPart({
     return null;
   }, [partData, value]);
 
-  const loadOptions = async (
-    searchQuery: string,
-    _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
-    additional?: { page: number }
-  ) => {
-    const page = additional?.page || 1;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-    const token = localStorage.getItem("token");
+  const fetchParts = useCallback(
+    async (
+      searchQuery: string,
+      _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
+      additional?: { page: number }
+    ) => {
+      const page = additional?.page || 1;
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      const token = localStorage.getItem("token");
 
-    if (!baseUrl) {
-      throw new Error("URL da API não configurada");
-    }
+      if (!baseUrl) {
+        throw new Error("URL da API não configurada");
+      }
 
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      itemsPerPage: "4",
-      orderBy: "name",
-      orderDirection: "asc",
-    });
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        itemsPerPage: "4",
+        orderBy: "name",
+        orderDirection: "asc",
+      });
 
-    if (searchQuery) {
-      queryParams.append("name", searchQuery);
-    }
+      if (searchQuery) {
+        queryParams.append("name", searchQuery);
+      }
 
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${baseUrl}/parts?${queryParams}`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar peças");
+      }
+
+      const data = await response.json();
+      const parts: Part[] = data.data || [];
+      const pagination = data.pagination;
+
+      const options: SelectOption[] = parts.map((part) => ({
+        value: part.id,
+        label: `${part.name} ${part.model}`,
+        price: part.price,
+      }));
+
+      return {
+        options,
+        hasMore: pagination?.hasNext || false,
+        additional: {
+          page: page + 1,
+        },
+      };
+    },
+    []
+  );
+
+  const loadOptions = useCallback(
+    async (
+      searchQuery: string,
+      _: OptionsOrGroups<SelectOption, GroupBase<SelectOption>>,
+      additional?: { page: number }
+    ) => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      return new Promise<{
+        options: SelectOption[];
+        hasMore: boolean;
+        additional: { page: number };
+      }>((resolve) => {
+        debounceTimerRef.current = setTimeout(() => {
+          fetchParts(searchQuery, _, additional).then(resolve);
+        }, 500);
+      });
+    },
+    [fetchParts]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${baseUrl}/parts?${queryParams}`, {
-      headers,
-    });
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar peças");
-    }
-
-    const data = await response.json();
-    const parts: Part[] = data.data || [];
-    const pagination = data.pagination;
-
-    const options: SelectOption[] = parts.map((part) => ({
-      value: part.id,
-      label: `${part.name} ${part.model}`,
-      price: part.price,
-    }));
-
-    return {
-      options,
-      hasMore: pagination?.hasNext || false,
-      additional: {
-        page: page + 1,
-      },
-    };
-  };
+  }, []);
 
   return (
     <AsyncPaginate
@@ -114,6 +150,10 @@ export function AsyncSelectPart({
       placeholder={placeholder}
       isSearchable
       isClearable
+      loadingMessage={() => "Carregando..."}
+      noOptionsMessage={({ inputValue }) =>
+        inputValue ? "Nenhuma peça encontrada" : "Digite para buscar peças"
+      }
       menuShouldScrollIntoView={false}
       styles={{
         control: (base, state) => ({

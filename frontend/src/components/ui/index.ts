@@ -15,3 +15,4 @@ export { NoteFormDialog } from "./NoteFormDialog";
 export { AsyncSelectCustomer } from "./AsyncSelectCustomer";
 export { AsyncSelectCar } from "./AsyncSelectCar";
 export { AsyncSelectPart } from "./AsyncSelectPart";
+export { CurrencyInput } from "./CurrencyInput";
