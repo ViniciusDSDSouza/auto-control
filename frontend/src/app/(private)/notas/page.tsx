@@ -22,7 +22,7 @@ import {
   Popover,
   Portal,
 } from "@chakra-ui/react";
-import { NoteFormDialog } from "@/src/components/ui/NoteFormDialog";
+import { NoteFormDialog, CustomerTableSkeleton } from "@/src/components/ui";
 import { useNotesGet, useNotesEdit, useNotesDelete } from "./useNotesPage";
 import { FaPlus, FaEdit, FaTrash, FaCalendar } from "react-icons/fa";
 import { NoteStatus } from "@/src/modules/note/types";
@@ -148,27 +148,73 @@ export default function NotasPage() {
           </Button>
         </HStack>
 
-        <Box
-          borderRadius="xl"
-          borderWidth="1px"
-          borderColor="gray.200"
-          bg="white"
-          overflow="hidden"
-        >
-          {isLoadingNotes ? (
-            <Box p={6} textAlign="center">
-              <Text color="gray.500">Carregando notas...</Text>
-            </Box>
-          ) : (
-            <Table.Root variant="outline" size="lg">
+        {isLoadingNotes ? (
+          <CustomerTableSkeleton />
+        ) : (
+          <Box
+            borderWidth="1px"
+            borderRadius="xl"
+            overflowX="auto"
+            bg="white"
+            shadow="sm"
+          >
+            <Table.Root>
               <Table.Header>
                 <Table.Row>
-                  <Table.ColumnHeader>Cliente</Table.ColumnHeader>
-                  <Table.ColumnHeader>Carro</Table.ColumnHeader>
-                  <Table.ColumnHeader>Total</Table.ColumnHeader>
-                  <Table.ColumnHeader>Status</Table.ColumnHeader>
-                  <Table.ColumnHeader>Data</Table.ColumnHeader>
-                  <Table.ColumnHeader textAlign="right">
+                  <Table.ColumnHeader
+                    fontSize="xs"
+                    fontWeight="bold"
+                    minW="200px"
+                    w="25%"
+                    color="black"
+                    pl={4}
+                  >
+                    Cliente
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader
+                    fontSize="xs"
+                    fontWeight="bold"
+                    minW="180px"
+                    w="25%"
+                    color="black"
+                  >
+                    Carro
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader
+                    fontSize="xs"
+                    fontWeight="bold"
+                    minW="120px"
+                    w="15%"
+                    color="black"
+                  >
+                    Total
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader
+                    fontSize="xs"
+                    fontWeight="bold"
+                    minW="100px"
+                    w="12%"
+                    color="black"
+                  >
+                    Status
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader
+                    fontSize="xs"
+                    fontWeight="bold"
+                    minW="120px"
+                    w="13%"
+                    color="black"
+                  >
+                    Data
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader
+                    fontSize="xs"
+                    fontWeight="bold"
+                    textAlign="center"
+                    minW="120px"
+                    w="10%"
+                    color="black"
+                  >
                     Ações
                   </Table.ColumnHeader>
                 </Table.Row>
@@ -187,21 +233,21 @@ export default function NotasPage() {
                   </Table.Row>
                 ) : (
                   notes.map((note) => (
-                    <Table.Row key={note.id}>
-                      <Table.Cell fontWeight="medium">
+                    <Table.Row key={note.id} _hover={{ bg: "orange.50" }}>
+                      <Table.Cell fontSize="lg" minW="200px" pl={4}>
                         {note.customer?.name || "-"}
                       </Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell fontSize="lg" color="gray.600" minW="180px">
                         {note.car
                           ? `${note.car.brand} ${note.car.model}${
                               note.car.plate ? ` - ${note.car.plate}` : ""
                             }`
                           : "-"}
                       </Table.Cell>
-                      <Table.Cell fontWeight="bold">
+                      <Table.Cell fontSize="lg" color="gray.600" minW="120px">
                         {formatCurrency(note.totalPrice)}
                       </Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell minW="100px">
                         <Badge
                           colorPalette={getStatusBadgeColor(note.status)}
                           size="lg"
@@ -209,24 +255,28 @@ export default function NotasPage() {
                           {getStatusLabel(note.status)}
                         </Badge>
                       </Table.Cell>
-                      <Table.Cell>{formatDate(note.createdAt)}</Table.Cell>
-                      <Table.Cell>
-                        <HStack gap={2} justifyContent="flex-end">
+                      <Table.Cell fontSize="lg" color="gray.600" minW="120px">
+                        {formatDate(note.createdAt)}
+                      </Table.Cell>
+                      <Table.Cell minW="120px">
+                        <HStack gap={2} justifyContent="center">
                           <IconButton
-                            aria-label="Editar nota"
-                            colorPalette="blue"
-                            variant="ghost"
                             size="sm"
+                            variant="ghost"
+                            aria-label="Editar nota"
+                            colorPalette="orange"
                             onClick={() => handleOpenEditDialog(note)}
+                            _hover={{ bg: "transparent" }}
                           >
                             <FaEdit />
                           </IconButton>
                           <IconButton
+                            size="sm"
+                            variant="ghost"
                             aria-label="Excluir nota"
                             colorPalette="red"
-                            variant="ghost"
-                            size="sm"
                             onClick={() => handleDeleteClick(note.id)}
+                            _hover={{ bg: "transparent" }}
                           >
                             <FaTrash />
                           </IconButton>
@@ -237,135 +287,134 @@ export default function NotasPage() {
                 )}
               </Table.Body>
             </Table.Root>
-          )}
 
-          {notes.length > 0 && (
-            <Box
-              borderTopWidth="1px"
-              px={6}
-              py={4}
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              flexWrap="wrap"
-              gap={4}
-            >
-              <HStack gap={2} alignItems="center">
-                <Text fontSize="sm" color="gray.600">
-                  Itens por página:
-                </Text>
-                <Select.Root
-                  collection={createListCollection({
-                    items: [
-                      { label: "5", value: "5" },
-                      { label: "10", value: "10" },
-                      { label: "25", value: "25" },
-                      { label: "50", value: "50" },
-                    ],
-                  })}
-                  value={[params.itemsPerPage?.toString() || "10"]}
-                  onValueChange={(details) =>
-                    handleItemsPerPageChange(Number(details.value[0]))
-                  }
-                  positioning={{ placement: "bottom-start" }}
-                  closeOnSelect={true}
-                >
-                  <SelectTrigger w="70px">
-                    <SelectValueText />
-                  </SelectTrigger>
-                  <SelectPositioner w="70px">
-                    <SelectContent>
-                      <SelectItem item={{ label: "5", value: "5" }}>
-                        5
-                      </SelectItem>
-                      <SelectItem item={{ label: "10", value: "10" }}>
-                        10
-                      </SelectItem>
-                      <SelectItem item={{ label: "25", value: "25" }}>
-                        25
-                      </SelectItem>
-                      <SelectItem item={{ label: "50", value: "50" }}>
-                        50
-                      </SelectItem>
-                    </SelectContent>
-                  </SelectPositioner>
-                </Select.Root>
-              </HStack>
-
-              <Pagination.Root
-                count={pagination?.totalItems || 0}
-                pageSize={params.itemsPerPage || 10}
-                page={pagination?.page || 1}
-                onPageChange={(details) => handlePageChange(details.page)}
-                siblingCount={2}
+            {pagination && (
+              <Box
+                borderTopWidth="1px"
+                px={6}
+                py={4}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
               >
-                <ButtonGroup variant="ghost" size="sm">
-                  <Pagination.PrevTrigger asChild>
-                    <IconButton
-                      aria-label="Página anterior"
-                      colorPalette="orange"
-                      borderRadius="md"
-                      w="36px"
-                      h="36px"
-                    >
-                      <LuChevronLeft />
-                    </IconButton>
-                  </Pagination.PrevTrigger>
+                <HStack gap={2} alignItems="center">
+                  <Text fontSize="sm" color="gray.600">
+                    Itens por página:
+                  </Text>
+                  <Select.Root
+                    collection={createListCollection({
+                      items: [
+                        { label: "5", value: "5" },
+                        { label: "10", value: "10" },
+                        { label: "25", value: "25" },
+                        { label: "50", value: "50" },
+                      ],
+                    })}
+                    value={[params.itemsPerPage?.toString() || "10"]}
+                    onValueChange={(details) =>
+                      handleItemsPerPageChange(Number(details.value[0]))
+                    }
+                    positioning={{ placement: "bottom-start" }}
+                    closeOnSelect={true}
+                  >
+                    <SelectTrigger w="60px">
+                      <SelectValueText />
+                    </SelectTrigger>
+                    <SelectPositioner w="60px">
+                      <SelectContent>
+                        <SelectItem item={{ label: "5", value: "5" }}>
+                          5
+                        </SelectItem>
+                        <SelectItem item={{ label: "10", value: "10" }}>
+                          10
+                        </SelectItem>
+                        <SelectItem item={{ label: "25", value: "25" }}>
+                          25
+                        </SelectItem>
+                        <SelectItem item={{ label: "50", value: "50" }}>
+                          50
+                        </SelectItem>
+                      </SelectContent>
+                    </SelectPositioner>
+                  </Select.Root>
+                </HStack>
 
-                  <Pagination.Items
-                    render={(page) => {
-                      const isCurrentPage =
-                        page.type === "page" && pagination?.page === page.value;
-                      return (
-                        <Pagination.Item
-                          key={
-                            page.type === "page"
-                              ? page.value
-                              : `page-${page.value}`
-                          }
-                          value={page.value}
-                          type={page.type}
-                          aria-label={`Página ${page.value}`}
-                          w="36px"
-                          h="36px"
-                          minW="36px"
-                          p={0}
-                          borderRadius="md"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          bg={isCurrentPage ? "orange.500" : "transparent"}
-                          color={isCurrentPage ? "white" : "orange.500"}
-                          borderWidth={isCurrentPage ? "0" : "1px"}
-                          borderColor="orange.500"
-                          cursor="pointer"
-                          _hover={{
-                            bg: isCurrentPage ? "orange.600" : "orange.50",
-                          }}
-                          transition="all 0.2s"
-                        >
-                          {page.type === "page" ? page.value : "..."}
-                        </Pagination.Item>
-                      );
-                    }}
-                  />
+                <Pagination.Root
+                  count={pagination?.totalItems || 0}
+                  pageSize={params.itemsPerPage || 10}
+                  page={pagination?.page || 1}
+                  onPageChange={(details) => handlePageChange(details.page)}
+                  siblingCount={2}
+                >
+                  <ButtonGroup variant="ghost" size="sm">
+                    <Pagination.PrevTrigger asChild>
+                      <IconButton
+                        aria-label="Página anterior"
+                        colorPalette="orange"
+                        borderRadius="md"
+                        w="36px"
+                        h="36px"
+                      >
+                        <LuChevronLeft />
+                      </IconButton>
+                    </Pagination.PrevTrigger>
 
-                  <Pagination.NextTrigger asChild>
-                    <IconButton
-                      aria-label="Próxima página"
-                      colorPalette="orange"
-                      borderRadius="md"
-                      w="36px"
-                      h="36px"
-                    >
-                      <LuChevronRight />
-                    </IconButton>
-                  </Pagination.NextTrigger>
-                </ButtonGroup>
-              </Pagination.Root>
-            </Box>
-          )}
-        </Box>
+                    <Pagination.Items
+                      render={(page) => {
+                        const isCurrentPage =
+                          page.type === "page" &&
+                          pagination?.page === page.value;
+                        return (
+                          <Pagination.Item
+                            key={
+                              page.type === "page"
+                                ? page.value
+                                : `page-${page.value}`
+                            }
+                            value={page.value}
+                            type={page.type}
+                            aria-label={`Página ${page.value}`}
+                            w="36px"
+                            h="36px"
+                            minW="36px"
+                            p={0}
+                            borderRadius="md"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            bg={isCurrentPage ? "orange.500" : "transparent"}
+                            color={isCurrentPage ? "white" : "orange.500"}
+                            borderWidth={isCurrentPage ? "0" : "1px"}
+                            borderColor="orange.500"
+                            cursor="pointer"
+                            _hover={{
+                              bg: isCurrentPage ? "orange.600" : "orange.50",
+                            }}
+                            transition="all 0.2s"
+                          >
+                            {page.type === "page" ? page.value : "..."}
+                          </Pagination.Item>
+                        );
+                      }}
+                    />
+
+                    <Pagination.NextTrigger asChild>
+                      <IconButton
+                        aria-label="Próxima página"
+                        colorPalette="orange"
+                        borderRadius="md"
+                        w="36px"
+                        h="36px"
+                      >
+                        <LuChevronRight />
+                      </IconButton>
+                    </Pagination.NextTrigger>
+                  </ButtonGroup>
+                </Pagination.Root>
+              </Box>
+            )}
+          </Box>
+        )}
       </Stack>
 
       <NoteFormDialog
