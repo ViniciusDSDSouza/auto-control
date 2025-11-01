@@ -253,6 +253,10 @@ export const updateNote = async (
 
 export const deleteNote = async (id: string) => {
   try {
+    await prisma.partInNote.deleteMany({
+      where: { noteId: id },
+    });
+
     await prisma.note.delete({
       where: { id },
     });

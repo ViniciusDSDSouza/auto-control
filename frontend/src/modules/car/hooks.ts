@@ -112,9 +112,13 @@ export function useDeleteCar() {
         duration: 5000,
       });
     } catch (error) {
+      const errorMessage =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Erro desconhecido ao excluir carro";
+
       toaster.create({
-        title: "Erro ao excluir carro!",
-        description: "Por favor, tente novamente.",
+        title: "Erro!",
+        description: errorMessage,
         type: "error",
         duration: 5000,
       });

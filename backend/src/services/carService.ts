@@ -147,11 +147,37 @@ export const updateCar = async (
 
 export const deleteCar = async (id: string) => {
   try {
+    const car = await prisma.car.findUnique({
+      where: { id },
+      include: {
+        notes: true,
+      },
+    });
+
+    if (!car) {
+      throw new Error("Car not found");
+    }
+
+    const notesCount = car.notes.length;
+
+    if (notesCount > 0) {
+      throw new Error(
+        `Não é possível excluir ${car.brand} ${
+          car.model
+        }. O veículo possui ${notesCount} nota${
+          notesCount > 1 ? "s" : ""
+        } cadastrada${notesCount > 1 ? "s" : ""}.`
+      );
+    }
+
     await prisma.car.delete({
       where: { id },
     });
     return { message: "Car deleted successfully" };
   } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
     console.error(error);
     throw new Error("Failed to delete car");
   }

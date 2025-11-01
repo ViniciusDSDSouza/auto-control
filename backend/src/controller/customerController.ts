@@ -103,6 +103,14 @@ export const deleteCustomerController = async (
     res.status(200).json({ message: "Customer deleted successfully" });
   } catch (error) {
     console.error(error);
+    if (error instanceof Error) {
+      if (
+        error.message.includes("Não é possível excluir") &&
+        (error.message.includes("veículo") || error.message.includes("nota"))
+      ) {
+        return res.status(400).json({ message: error.message });
+      }
+    }
     res.status(500).json({ message: "Failed to delete customer" });
   }
 };

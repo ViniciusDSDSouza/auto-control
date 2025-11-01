@@ -131,12 +131,46 @@ export const updateCustomer = async (
 
 export const deleteCustomer = async (id: string) => {
   try {
+    const customer = await prisma.customer.findUnique({
+      where: { id },
+      include: {
+        cars: true,
+        notes: true,
+      },
+    });
+
+    if (!customer) {
+      throw new Error("Customer not found");
+    }
+
+    const carsCount = customer.cars.length;
+    const notesCount = customer.notes.length;
+
+    if (carsCount > 0 || notesCount > 0) {
+      const parts: string[] = [];
+      if (carsCount > 0) {
+        parts.push(`${carsCount} veículo${carsCount > 1 ? "s" : ""}`);
+      }
+      if (notesCount > 0) {
+        parts.push(`${notesCount} nota${notesCount > 1 ? "s" : ""}`);
+      }
+
+      throw new Error(
+        `Não é possível excluir ${customer.name}. O cliente possui ${parts.join(
+          " e "
+        )} cadastrado${carsCount + notesCount > 1 ? "s" : ""}.`
+      );
+    }
+
     await prisma.customer.delete({
       where: { id },
     });
 
     return { message: "Customer deleted successfully" };
   } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
     console.error(error);
     throw new Error("Failed to delete customer");
   }

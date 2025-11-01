@@ -108,9 +108,13 @@ export function useDeleteCustomer() {
         duration: 5000,
       });
     } catch (error) {
+      const errorMessage =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Erro desconhecido ao excluir cliente";
+
       toaster.create({
-        title: "Erro ao excluir cliente!",
-        description: "Por favor, tente novamente.",
+        title: "Erro!",
+        description: errorMessage,
         type: "error",
         duration: 5000,
       });
