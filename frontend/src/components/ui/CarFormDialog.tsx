@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog, Stack, Button, Text, HStack } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInput } from "./FormInput";
 import { AsyncSelectCustomer } from "./AsyncSelectCustomer";
@@ -27,7 +27,7 @@ export function CarFormDialog({
     register,
     handleSubmit,
     formState: { errors },
-    watch,
+    control,
     setValue,
   } = useForm<CarSchema>({
     resolver: zodResolver(carSchema),
@@ -37,7 +37,7 @@ export function CarFormDialog({
           brand: car.brand,
           model: car.model,
           plate: car.plate || "",
-          year: car.year || undefined,
+          year: car.year,
           color: car.color,
         }
       : {
@@ -50,7 +50,10 @@ export function CarFormDialog({
         },
   });
 
-  const customerIdValue = watch("customerId");
+  const customerIdValue = useWatch({
+    control,
+    name: "customerId",
+  });
 
   const handleClose = () => {
     onClose();

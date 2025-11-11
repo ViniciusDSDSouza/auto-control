@@ -35,7 +35,8 @@ auto-control/
 ├── backend/          # API REST em Node.js/Express
 ├── frontend/         # Aplicação Next.js
 ├── docs/            # Documentação e screenshots
-└── docker-compose.yml
+├── docker-compose-dev.yml  # Docker Compose para desenvolvimento
+└── docker-compose-prod.yml # Docker Compose para produção
 ```
 
 ## 🛠 Tecnologias Utilizadas
@@ -94,19 +95,19 @@ auto-control/
 3. **Inicie os containers**
 
    ```bash
-   docker-compose up -d
+   docker compose -f docker-compose-dev.yml up -d
    ```
 
 4. **Execute as migrations do banco de dados**
 
    ```bash
-   docker-compose exec backend npx prisma migrate dev
+   docker compose -f docker-compose-dev.yml exec backend npx prisma migrate dev
    ```
 
 5. **Opcional: Execute o seed para popular o banco**
 
    ```bash
-   docker-compose exec backend npm run seed
+   docker compose -f docker-compose-dev.yml exec backend npm run seed
    ```
 
 6. **Acesse a aplicação**

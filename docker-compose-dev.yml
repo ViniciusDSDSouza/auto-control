@@ -10,12 +10,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata_dev:/var/lib/postgresql/data
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: auto-control-backend
     restart: always
     ports:
@@ -24,19 +24,24 @@ services:
       - ./.env
     depends_on:
       - db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     command: npm run dev
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: auto-control-frontend
     ports:
       - "3001:3000"
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     command: npm run dev
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 volumes:
-  pgdata:
+  pgdata_dev:
