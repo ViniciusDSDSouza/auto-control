@@ -13,7 +13,7 @@ export interface Car extends CarDto {
   updatedAt: string;
   customer?: {
     id: string;
-    name: string;
+    name: string | null;
   };
 }
 
