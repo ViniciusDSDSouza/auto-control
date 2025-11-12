@@ -35,13 +35,13 @@ export const loginUser = async ({ email, password }: LoginUserDto) => {
     });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("Failed to login user");
     }
 
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      throw new Error("Invalid password");
+      throw new Error("Failed to login user");
     }
 
     const token = generateToken(user.id);
