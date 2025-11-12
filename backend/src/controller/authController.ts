@@ -8,9 +8,9 @@ export const registerController = async (
 ) => {
   try {
     const { name, email, password } = req.body;
-    const result = await registerUser({ name, email, password });
+    await registerUser({ name, email, password });
 
-    res.status(201).json(result);
+    res.status(201).json({ message: "Usuário registrado com sucesso" });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Erro ao registrar usuário";
