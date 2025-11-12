@@ -28,7 +28,6 @@ export function AsyncSelectCustomer({
     skip: !value,
   });
 
-  // const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedCustomer = useMemo<SelectOption | null>(() => {
@@ -49,7 +48,6 @@ export function AsyncSelectCustomer({
     ) => {
       const page = additional?.page || 1;
       const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      const token = localStorage.getItem("token");
 
       if (!baseUrl) {
         throw new Error("URL da API não configurada");
@@ -66,16 +64,11 @@ export function AsyncSelectCustomer({
         queryParams.append("name", searchQuery);
       }
 
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`${baseUrl}/customers?${queryParams}`, {
-        headers,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {

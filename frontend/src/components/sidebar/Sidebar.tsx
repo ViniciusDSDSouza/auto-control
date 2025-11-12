@@ -11,21 +11,17 @@ import {
   HStack,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { sidebarItems } from "./sidebarItems";
 import { FaBars, FaSignOutAlt, FaTimes } from "react-icons/fa";
+import { useLogoutUser } from "@/src/modules/auth/hooks";
 
 export function Sidebar() {
   const { open, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
-  const router = useRouter();
   const isMobile = useBreakpointValue({ base: true, lg: false });
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
-  };
+  const { handleLogoutUser } = useLogoutUser();
 
   const sidebarContent = (
     <Stack
@@ -117,7 +113,7 @@ export function Sidebar() {
         <Button
           variant="outline"
           size="md"
-          onClick={handleLogout}
+          onClick={handleLogoutUser}
           w="full"
           color="white"
           borderColor="whiteAlpha.400"

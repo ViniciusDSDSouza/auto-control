@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "@/src/components/sidebar/Sidebar";
-import { Box } from "@chakra-ui/react";
+import { Box, Center, Spinner } from "@chakra-ui/react";
+import { useCheckAuth } from "@/src/modules/auth/hooks";
 
 export default function PrivateLayout({
   children,
@@ -11,14 +12,20 @@ export default function PrivateLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
-
+  const { authenticated, isLoading, isError } = useCheckAuth();
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!isLoading && isError && !authenticated) {
       router.push("/login");
     }
-  }, [router, pathname]);
+  }, [router, authenticated, isLoading, isError]);
+
+  if (isLoading) {
+    return (
+      <Center h="100vh">
+        <Spinner />
+      </Center>
+    );
+  }
 
   return (
     <>

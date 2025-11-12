@@ -1,4 +1,9 @@
-import { useLoginUserMutation, useRegisterUserMutation } from "./api";
+import {
+  useCheckAuthQuery,
+  useLoginUserMutation,
+  useLogoutUserMutation,
+  useRegisterUserMutation,
+} from "./api";
 import { RegisterSchema } from "@/src/app/(authentication)/cadastro/schema";
 import { loginFormToDto, registerFormToDto } from "./adapter";
 import { useRouter } from "next/navigation";
@@ -49,8 +54,6 @@ export function useLoginUser() {
     try {
       const response = await loginUser(loginFormToDto(data)).unwrap();
 
-      localStorage.setItem("token", response.token);
-
       toaster.create({
         title: "Login realizado com sucesso!",
         description: "Você pode agora acessar o sistema!",
@@ -75,5 +78,37 @@ export function useLoginUser() {
   return {
     handleLoginUser,
     isLoading,
+  };
+}
+
+export function useLogoutUser() {
+  const router = useRouter();
+  const [logoutUser] = useLogoutUserMutation();
+
+  async function handleLogoutUser() {
+    await logoutUser().unwrap();
+
+    toaster.create({
+      title: "Logout realizado com sucesso!",
+      description: "Você foi desconectado com sucesso!",
+      type: "success",
+      duration: 5000,
+    });
+
+    router.push("/login");
+  }
+
+  return {
+    handleLogoutUser,
+  };
+}
+
+export function useCheckAuth() {
+  const { data, isLoading, isError } = useCheckAuthQuery();
+
+  return {
+    authenticated: data?.authenticated || false,
+    isLoading,
+    isError,
   };
 }

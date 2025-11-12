@@ -6,6 +6,7 @@ import { carRoutes } from "./routes/carRoutes";
 import { partRoutes } from "./routes/partRoutes";
 import { enumNoteStatusRoutes } from "./routes/enumNoteStatusRoutes";
 import { noteRoutes } from "./routes/noteRoutes";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
@@ -14,8 +15,11 @@ app.use(
     origin: process.env.FRONTEND_URL,
     methods: "GET, POST, PUT, DELETE",
     allowedHeaders: "Content-Type, Authorization",
+    credentials: true,
   })
 );
+
+app.use(cookieParser());
 
 app.use(express.json());
 

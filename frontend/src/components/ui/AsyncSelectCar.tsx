@@ -52,7 +52,6 @@ export function AsyncSelectCar({
     ) => {
       const page = additional?.page || 1;
       const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      const token = localStorage.getItem("token");
 
       if (!baseUrl) {
         throw new Error("URL da API não configurada");
@@ -73,16 +72,11 @@ export function AsyncSelectCar({
         queryParams.append("brand", searchQuery);
       }
 
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
       const response = await fetch(`${baseUrl}/cars?${queryParams}`, {
-        headers,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {

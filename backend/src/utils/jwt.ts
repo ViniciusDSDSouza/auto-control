@@ -8,7 +8,7 @@ export const generateToken = (userId: string) => {
     throw new Error("JWT_SECRET is not set");
   }
 
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "12h" });
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "1h" });
 };
 
 export const verifyToken = (token: string): JwtPayload => {
