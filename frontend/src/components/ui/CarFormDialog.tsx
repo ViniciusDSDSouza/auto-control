@@ -29,6 +29,7 @@ export function CarFormDialog({
     formState: { errors },
     control,
     setValue,
+    reset,
   } = useForm<CarSchema>({
     resolver: zodResolver(carSchema),
     values: car
@@ -70,6 +71,7 @@ export function CarFormDialog({
     };
 
     await onSubmit(submitData);
+    reset();
     handleClose();
   };
 

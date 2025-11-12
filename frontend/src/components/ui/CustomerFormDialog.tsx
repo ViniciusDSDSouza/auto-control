@@ -28,6 +28,7 @@ export function CustomerFormDialog({
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<CustomerSchema>({
     resolver: zodResolver(customerSchema),
     values: customer
@@ -66,6 +67,7 @@ export function CustomerFormDialog({
     };
 
     await onSubmit(submitData);
+    reset();
     handleClose();
   };
 

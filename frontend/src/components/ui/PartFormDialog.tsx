@@ -27,6 +27,7 @@ export function PartFormDialog({
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<PartSchema>({
     resolver: zodResolver(partSchema),
@@ -55,6 +56,7 @@ export function PartFormDialog({
     };
 
     await onSubmit(submitData);
+    reset();
     handleClose();
   };
 
