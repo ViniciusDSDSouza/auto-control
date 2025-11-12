@@ -19,6 +19,10 @@ export function useGetCustomers(params?: GetCustomersParams) {
     queryParams.name = params.name;
   }
 
+  if (params?.phone) {
+    queryParams.phone = params.phone;
+  }
+
   const { data, isLoading } = useGetCustomersQuery(queryParams);
 
   return {

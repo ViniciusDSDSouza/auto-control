@@ -9,18 +9,32 @@ export const getAllCustomers = async ({
   page = 1,
   itemsPerPage = 10,
   name,
+  phone,
   orderBy = "updatedAt",
   orderDirection = "desc",
 }: GetCustomersParams): Promise<PaginatedResponse<CustomerDto>> => {
   try {
-    const where = name
-      ? {
+    const where: any = {};
+
+    if (name || phone) {
+      where.OR = [];
+      if (name) {
+        where.OR.push({
           name: {
             contains: name,
             mode: "insensitive" as const,
           },
-        }
-      : {};
+        });
+      }
+      if (phone) {
+        where.OR.push({
+          phone: {
+            contains: phone,
+            mode: "insensitive" as const,
+          },
+        });
+      }
+    }
 
     const total = await prisma.customer.count({ where });
 
@@ -38,7 +52,7 @@ export const getAllCustomers = async ({
     return {
       data: customers.map((customer) => ({
         id: customer.id,
-        name: customer.name,
+        name: customer.name ?? undefined,
         phone: customer.phone ?? undefined,
         email: customer.email ?? undefined,
       })),
@@ -63,7 +77,11 @@ export const getCustomerById = async (id: string) => {
       where: { id },
       include: {
         cars: true,
-        notes: true,
+        notes: {
+          include: {
+            car: true,
+          },
+        },
       },
     });
 

@@ -95,6 +95,9 @@ export function CustomerFormDialog({
                   error={errors.name?.message}
                   {...register("name")}
                 />
+                <Text fontSize="sm" color="gray.500" mt={-2}>
+                  * Preencha pelo menos o nome ou o telefone
+                </Text>
 
                 <FormInput
                   label="E-mail"

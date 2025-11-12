@@ -32,9 +32,14 @@ export function AsyncSelectCustomer({
 
   const selectedCustomer = useMemo<SelectOption | null>(() => {
     if (customerData && value && customerData.id === value) {
+      const label = customerData.name
+        ? customerData.phone
+          ? `${customerData.name} - ${customerData.phone}`
+          : customerData.name
+        : customerData.phone || "Cliente sem nome";
       return {
         value: customerData.id,
-        label: customerData.name,
+        label,
       };
     }
     return null;
@@ -62,6 +67,7 @@ export function AsyncSelectCustomer({
 
       if (searchQuery) {
         queryParams.append("name", searchQuery);
+        queryParams.append("phone", searchQuery);
       }
 
       const response = await fetch(`${baseUrl}/customers?${queryParams}`, {
@@ -79,10 +85,17 @@ export function AsyncSelectCustomer({
       const customers: Customer[] = data.data || [];
       const pagination = data.pagination;
 
-      const options: SelectOption[] = customers.map((customer) => ({
-        value: customer.id,
-        label: customer.name,
-      }));
+      const options: SelectOption[] = customers.map((customer) => {
+        const label = customer.name
+          ? customer.phone
+            ? `${customer.name} - ${customer.phone}`
+            : customer.name
+          : customer.phone || "Cliente sem nome";
+        return {
+          value: customer.id,
+          label,
+        };
+      });
 
       return {
         options,
@@ -111,7 +124,6 @@ export function AsyncSelectCustomer({
         additional: { page: number };
       }>((resolve) => {
         debounceTimerRef.current = setTimeout(() => {
-          // setDebouncedSearchQuery(searchQuery);
           fetchCustomers(searchQuery, _, additional).then(resolve);
         }, 500);
       });

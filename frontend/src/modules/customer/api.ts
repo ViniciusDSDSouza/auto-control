@@ -22,6 +22,7 @@ export const customerApi = createApi({
         if (params.itemsPerPage)
           queryParams.itemsPerPage = params.itemsPerPage.toString();
         if (params.name) queryParams.name = params.name;
+        if (params.phone) queryParams.phone = params.phone;
         if (params.orderBy) queryParams.orderBy = params.orderBy;
         if (params.orderDirection)
           queryParams.orderDirection = params.orderDirection;

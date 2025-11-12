@@ -14,6 +14,7 @@ export function useCustomersGet() {
     page: 1,
     itemsPerPage: 10,
     name: "",
+    phone: "",
     orderBy: "updatedAt",
     orderDirection: "desc",
   });
@@ -25,6 +26,7 @@ export function useCustomersGet() {
       setParams((prev) => ({
         ...prev,
         name: searchInput,
+        phone: searchInput,
         page: 1,
       }));
     }, 500);
@@ -128,18 +130,23 @@ export function useCustomersDelete() {
 
   const [deleteConfirm, setDeleteConfirm] = useState<{
     id: string;
-    name: string;
+    displayName: string;
   } | null>(null);
 
-  const handleDeleteClick = (id: string, name: string) => {
-    setDeleteConfirm({ id, name });
+  const handleDeleteClick = (
+    id: string,
+    name: string | undefined,
+    phone: string | undefined
+  ) => {
+    const displayName = name || phone || "Cliente sem nome";
+    setDeleteConfirm({ id, displayName });
   };
 
   const handleDeleteConfirm = async () => {
     if (!deleteConfirm) return;
 
     try {
-      await handleDeleteCustomer(deleteConfirm.id, deleteConfirm.name);
+      await handleDeleteCustomer(deleteConfirm.id, deleteConfirm.displayName);
       setDeleteConfirm(null);
     } catch {
       setDeleteConfirm(null);

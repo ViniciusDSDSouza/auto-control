@@ -91,7 +91,7 @@ export default function ClientesPage() {
             }
           >
             <Input
-              placeholder="Pesquisar por nome"
+              placeholder="Pesquisar por nome ou telefone"
               value={searchInput || ""}
               onChange={(e) => handleSearchChange(e.target.value)}
               size="lg"
@@ -179,7 +179,7 @@ export default function ClientesPage() {
                   customers.map((customer) => (
                     <Table.Row key={customer.id} _hover={{ bg: "orange.50" }}>
                       <Table.Cell fontSize="lg" minW="200px" pl={4}>
-                        {customer.name}
+                        {customer.name || "-"}
                       </Table.Cell>
                       <Table.Cell fontSize="lg" color="gray.600" minW="180px">
                         {customer.email || "-"}
@@ -218,7 +218,11 @@ export default function ClientesPage() {
                             aria-label="Excluir"
                             colorPalette="red"
                             onClick={() =>
-                              handleDeleteClick(customer.id, customer.name)
+                              handleDeleteClick(
+                                customer.id,
+                                customer.name,
+                                customer.phone
+                              )
                             }
                             _hover={{ bg: "transparent" }}
                           >
@@ -379,8 +383,8 @@ export default function ClientesPage() {
             <Dialog.Body>
               <Text>
                 Tem certeza que deseja excluir o cliente{" "}
-                <strong>{deleteConfirm?.name}</strong>? Esta ação não pode ser
-                desfeita.
+                <strong>{deleteConfirm?.displayName}</strong>? Esta ação não
+                pode ser desfeita.
               </Text>
             </Dialog.Body>
             <Dialog.Footer>

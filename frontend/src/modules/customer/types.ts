@@ -1,5 +1,5 @@
 export interface CustomerDto {
-  name: string;
+  name?: string;
   phone?: string;
   email?: string;
 }
@@ -44,6 +44,7 @@ export interface GetCustomersParams {
   page?: number;
   itemsPerPage?: number;
   name?: string;
+  phone?: string;
   orderBy?: "name" | "email" | "phone" | "updatedAt";
   orderDirection?: "asc" | "desc";
 }

@@ -13,13 +13,14 @@ export const getAllCustomersController = async (
   req: Request<{}, {}, GetCustomersParams>,
   res: Response
 ) => {
-  const { page, itemsPerPage, name, orderBy, orderDirection } = req.query;
+  const { page, itemsPerPage, name, phone, orderBy, orderDirection } = req.query;
 
   try {
     const customers = await getAllCustomers({
       page: page ? Number(page) : undefined,
       itemsPerPage: itemsPerPage ? Number(itemsPerPage) : undefined,
       name: name as string,
+      phone: phone as string,
       orderBy: orderBy as "name" | "email" | "phone" | "updatedAt",
       orderDirection: orderDirection as "asc" | "desc",
     });
@@ -55,7 +56,7 @@ export const createCustomerController = async (
     const { name, phone, email, carsId, notesId } = req.body;
 
     const newCustomer = await createCustomer({
-      name: useSanitizeHtml(name),
+      name: name ? useSanitizeHtml(name) : undefined,
       phone: phone ? useSanitizeHtml(phone) : undefined,
       email: email ? useSanitizeHtml(email) : undefined,
       carsId,
@@ -78,7 +79,7 @@ export const updateCustomerController = async (
     const { name, phone, email, carsId, notesId } = req.body;
 
     const updatedCustomer = await updateCustomer(id, {
-      name: useSanitizeHtml(name),
+      name: name ? useSanitizeHtml(name) : undefined,
       phone: phone ? useSanitizeHtml(phone) : undefined,
       email: email ? useSanitizeHtml(email) : undefined,
       carsId,

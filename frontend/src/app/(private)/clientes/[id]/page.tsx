@@ -49,7 +49,7 @@ export default function ClientesOverviewPage() {
               <Skeleton height="20px" width="200px" />
             ) : (
               <Text fontSize="md" color="gray.700" fontWeight="medium">
-                {customer?.name || "Cliente"}
+                {customer?.name || customer?.phone || "Cliente"}
               </Text>
             )}
           </HStack>
