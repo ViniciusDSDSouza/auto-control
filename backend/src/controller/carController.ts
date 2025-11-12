@@ -7,6 +7,7 @@ import {
   deleteCar,
 } from "../services/carService";
 import { CarDto, GetCarsParams } from "../types/cars";
+import { useSanitizeHtml } from "../utils/sanitizeHtml";
 
 export const getAllCarsController = async (
   req: Request<{}, {}, {}, any>,
@@ -57,7 +58,15 @@ export const createCarController = async (
   res: Response
 ) => {
   try {
-    const newCar = await createCar(req.body);
+    const { customerId, brand, model, plate, year, color } = req.body;
+    const newCar = await createCar({
+      customerId,
+      brand: useSanitizeHtml(brand),
+      model: useSanitizeHtml(model),
+      plate: plate ? useSanitizeHtml(plate) : undefined,
+      year,
+      color: useSanitizeHtml(color),
+    });
     res.status(201).json(newCar);
   } catch (error) {
     console.error(error);
@@ -71,7 +80,15 @@ export const updateCarController = async (
 ) => {
   try {
     const { id } = req.params;
-    const updatedCar = await updateCar(id, req.body);
+    const { customerId, brand, model, plate, year, color } = req.body;
+    const updatedCar = await updateCar(id, {
+      customerId,
+      brand: useSanitizeHtml(brand),
+      model: useSanitizeHtml(model),
+      plate: plate ? useSanitizeHtml(plate) : undefined,
+      year,
+      color: useSanitizeHtml(color),
+    });
     res.status(200).json(updatedCar);
   } catch (error) {
     console.error(error);

@@ -7,6 +7,7 @@ import {
   deletePart,
 } from "../services/partService";
 import { PartDto, GetPartsParams } from "../types/part";
+import { useSanitizeHtml } from "../utils/sanitizeHtml";
 
 export const getAllPartsController = async (
   req: Request<{}, {}, GetPartsParams>,
@@ -18,7 +19,6 @@ export const getAllPartsController = async (
     const parts = await getAllParts({
       page: page ? Number(page) : undefined,
       itemsPerPage: itemsPerPage ? Number(itemsPerPage) : undefined,
-      name: name as string,
       orderBy: orderBy as "name" | "model" | "price" | "updatedAt",
       orderDirection: orderDirection as "asc" | "desc",
     });
@@ -49,7 +49,12 @@ export const createPartController = async (
   res: Response
 ) => {
   try {
-    const newPart = await createPart(req.body);
+    const { name, model, price } = req.body;
+    const newPart = await createPart({
+      name: useSanitizeHtml(name),
+      model: useSanitizeHtml(model),
+      price,
+    });
     res.status(201).json(newPart);
   } catch (error) {
     console.error(error);
@@ -63,7 +68,12 @@ export const updatePartController = async (
 ) => {
   try {
     const { id } = req.params;
-    const updatedPart = await updatePart(id, req.body);
+    const { name, model, price } = req.body;
+    const updatedPart = await updatePart(id, {
+      name: useSanitizeHtml(name),
+      model: useSanitizeHtml(model),
+      price,
+    });
     res.status(200).json(updatedPart);
   } catch (error) {
     console.error(error);

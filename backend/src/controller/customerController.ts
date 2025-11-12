@@ -7,6 +7,7 @@ import {
   deleteCustomer,
 } from "../services/customerService";
 import { CustomerDto, GetCustomersParams } from "../types/customer";
+import { useSanitizeHtml } from "../utils/sanitizeHtml";
 
 export const getAllCustomersController = async (
   req: Request<{}, {}, GetCustomersParams>,
@@ -54,9 +55,9 @@ export const createCustomerController = async (
     const { name, phone, email, carsId, notesId } = req.body;
 
     const newCustomer = await createCustomer({
-      name,
-      phone,
-      email,
+      name: useSanitizeHtml(name),
+      phone: phone ? useSanitizeHtml(phone) : undefined,
+      email: email ? useSanitizeHtml(email) : undefined,
       carsId,
       notesId,
     });
@@ -77,9 +78,9 @@ export const updateCustomerController = async (
     const { name, phone, email, carsId, notesId } = req.body;
 
     const updatedCustomer = await updateCustomer(id, {
-      name,
-      phone,
-      email,
+      name: useSanitizeHtml(name),
+      phone: phone ? useSanitizeHtml(phone) : undefined,
+      email: email ? useSanitizeHtml(email) : undefined,
       carsId,
       notesId,
     });
