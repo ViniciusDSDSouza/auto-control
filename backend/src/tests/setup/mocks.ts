@@ -1,3 +1,5 @@
+import type { AuthRequest } from "../../middlewares/authMiddleware";
+
 export const mockPrisma = {
   user: {
     count: jest.fn(),
@@ -61,3 +63,20 @@ jest.mock("../../utils/jwt", () => ({
   generateToken: jest.fn(),
   verifyToken: jest.fn(),
 }));
+
+jest.mock("express-rate-limit", () => {
+  const mockMiddleware = jest.fn((_req, _res, next) => next());
+  return {
+    rateLimit: jest.fn(() => mockMiddleware),
+  };
+});
+
+jest.mock("../../middlewares/authMiddleware", () => {
+  const mockUser = { id: "mock-user-id" };
+  return {
+    authMiddleware: jest.fn((req, _res, next) => {
+      (req as AuthRequest).user = mockUser;
+      next();
+    }),
+  };
+});

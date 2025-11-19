@@ -49,7 +49,7 @@ export const createMockUser = (overrides?: Partial<User>): User => ({
   id: randomUUID(),
   name: "John Doe",
   email: "john.doe@example.com",
-  password: "hashed_password",
+  password: "123456",
   createdAt: new Date(),
   updatedAt: new Date(),
   ...overrides,
