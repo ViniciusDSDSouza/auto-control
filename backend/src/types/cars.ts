@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 export interface CarDto {
   customerId: string;
   brand: string;
@@ -37,3 +39,6 @@ export interface PaginatedResponse<T> {
     hasPrev: boolean;
   };
 }
+
+export type CarWhereInput = Prisma.CarWhereInput;
+export type CarOrderByInput = Prisma.CarOrderByWithRelationInput;

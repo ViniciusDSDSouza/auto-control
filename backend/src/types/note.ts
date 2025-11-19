@@ -1,4 +1,5 @@
 import { NoteStatus } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 interface PartInNoteDto {
   partId: string;
@@ -81,3 +82,6 @@ export interface PaginatedResponse<T> {
     hasPrev: boolean;
   };
 }
+
+export type NoteWhereInput = Prisma.NoteWhereInput;
+export type NoteOrderByInput = Prisma.NoteOrderByWithRelationInput;

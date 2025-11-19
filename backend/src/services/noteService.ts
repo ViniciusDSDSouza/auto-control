@@ -4,8 +4,9 @@ import {
   Note,
   GetNotesParams,
   PaginatedResponse,
+  NoteWhereInput,
+  NoteOrderByInput,
 } from "../types/note";
-import { Prisma } from "@prisma/client";
 
 export const getAllNotes = async ({
   page = 1,
@@ -19,7 +20,7 @@ export const getAllNotes = async ({
   orderDirection = "desc",
 }: GetNotesParams): Promise<PaginatedResponse<Note>> => {
   try {
-    const where: Prisma.NoteWhereInput = {};
+    const where: NoteWhereInput = {};
 
     if (customerId) {
       where.customerId = customerId;
@@ -44,7 +45,7 @@ export const getAllNotes = async ({
 
     const total = await prisma.note.count({ where });
 
-    const orderByConfig: Prisma.NoteOrderByWithRelationInput = {};
+    const orderByConfig: NoteOrderByInput = {};
     if (orderBy === "customerId") {
       orderByConfig.customerId = orderDirection;
     } else if (orderBy === "carId") {

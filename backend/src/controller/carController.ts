@@ -10,7 +10,7 @@ import { CarDto, GetCarsParams } from "../types/cars";
 import { useSanitizeHtml } from "../utils/sanitizeHtml";
 
 export const getAllCarsController = async (
-  req: Request<{}, {}, {}, any>,
+  req: Request<{}, {}, {}, GetCarsParams>,
   res: Response
 ) => {
   try {

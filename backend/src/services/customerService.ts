@@ -3,6 +3,7 @@ import {
   CustomerDto,
   GetCustomersParams,
   PaginatedResponse,
+  CustomerWhereInput,
 } from "../types/customer";
 
 export const getAllCustomers = async ({
@@ -14,7 +15,7 @@ export const getAllCustomers = async ({
   orderDirection = "desc",
 }: GetCustomersParams): Promise<PaginatedResponse<CustomerDto>> => {
   try {
-    const where: any = {};
+    const where: CustomerWhereInput = {};
 
     if (name || phone) {
       where.OR = [];

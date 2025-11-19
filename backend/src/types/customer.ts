@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+
 export interface CustomerDto {
   name?: string;
   phone?: string;
@@ -26,3 +28,6 @@ export interface PaginatedResponse<T> {
     hasPrev: boolean;
   };
 }
+
+export type CustomerWhereInput = Prisma.CustomerWhereInput;
+export type CustomerOrderByInput = Prisma.CustomerOrderByWithRelationInput;

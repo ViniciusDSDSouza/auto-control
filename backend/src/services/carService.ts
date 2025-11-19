@@ -1,5 +1,12 @@
 import { prisma } from "../db/client";
-import { Car, CarDto, GetCarsParams, PaginatedResponse } from "../types/cars";
+import {
+  Car,
+  CarDto,
+  GetCarsParams,
+  PaginatedResponse,
+  CarWhereInput,
+  CarOrderByInput,
+} from "../types/cars";
 
 export const getAllCars = async ({
   page = 1,
@@ -10,12 +17,12 @@ export const getAllCars = async ({
   orderDirection = "desc",
 }: GetCarsParams): Promise<PaginatedResponse<Car>> => {
   try {
-    const where: any = {};
+    const where: CarWhereInput = {};
 
     if (brand) {
       where.brand = {
         contains: brand,
-        mode: "insensitive" as const,
+        mode: "insensitive",
       };
     }
 
@@ -25,7 +32,7 @@ export const getAllCars = async ({
 
     const total = await prisma.car.count({ where });
 
-    const orderByConfig: any = {};
+    const orderByConfig: CarOrderByInput = {};
     if (orderBy === "year") {
       orderByConfig.year = orderDirection;
     } else if (orderBy === "brand") {
