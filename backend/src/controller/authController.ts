@@ -2,6 +2,21 @@ import { registerUser, loginUser } from "../services/authService";
 import { Request, Response } from "express";
 import { RegisterUserDto, LoginUserDto } from "../types/user";
 
+const clearTokenCookie = (res: Response) => {
+  const options = [
+    { httpOnly: true, secure: true, sameSite: "none" as const },
+    { httpOnly: true, secure: true, sameSite: "lax" as const },
+    { httpOnly: true, secure: true, sameSite: "strict" as const },
+    { httpOnly: true, secure: false, sameSite: "none" as const },
+    { httpOnly: true, secure: false, sameSite: "lax" as const },
+    { httpOnly: true, secure: false, sameSite: "strict" as const },
+  ];
+
+  options.forEach((option) => {
+    res.clearCookie("token", option);
+  });
+};
+
 export const registerController = async (
   req: Request<{}, {}, RegisterUserDto>,
   res: Response
@@ -31,17 +46,7 @@ export const loginController = async (
     const sameSite =
       isProduction && isSecure ? "none" : isProduction ? "lax" : "strict";
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "lax" });
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-    });
+    clearTokenCookie(res);
 
     res.cookie("token", result, {
       httpOnly: true,
@@ -58,16 +63,8 @@ export const loginController = async (
 };
 
 export const logoutController = async (_req: Request, res: Response) => {
-  const isProduction = process.env.NODE_ENV === "production";
-  const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
-  const sameSite =
-    isProduction && isSecure ? "none" : isProduction ? "lax" : "strict";
+  clearTokenCookie(res);
 
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: isSecure,
-    sameSite: sameSite as "strict" | "lax" | "none",
-  });
   res.status(200).json({ message: "Logout successful" });
 };
 
