@@ -10,7 +10,7 @@
     "start": "node dist/server.js",
     "seed": "tsx prisma/seed.ts",
     "test": "jest",
-    "build:prod": "npm install && npx prisma generate && npm run build",
+    "build:prod": "npm ci --include=dev && npx prisma generate && npm run build",
     "start:prod": "prisma migrate deploy && npm run start"
   },
   "prisma": {
