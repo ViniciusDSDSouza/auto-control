@@ -54,6 +54,9 @@ export function useLoginUser() {
     try {
       const response = await loginUser(loginFormToDto(data)).unwrap();
 
+      // Aguardar um pouco para garantir que o cookie foi processado
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       toaster.create({
         title: "Login realizado com sucesso!",
         description: "Você pode agora acessar o sistema!",
@@ -61,7 +64,9 @@ export function useLoginUser() {
         duration: 5000,
       });
 
+      router.refresh();
       router.push("/notas");
+      
       return response;
     } catch (error) {
       toaster.create({

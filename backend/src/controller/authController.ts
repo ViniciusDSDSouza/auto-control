@@ -2,21 +2,20 @@ import { registerUser, loginUser } from "../services/authService";
 import { Request, Response } from "express";
 import { RegisterUserDto, LoginUserDto } from "../types/user";
 
-const getCookieOptions = () => {
-  const isProduction = process.env.NODE_ENV === "production";
-  const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
-  const sameSite = isProduction && isSecure ? "none" : "lax";
-
+const getCookieOptions = (req?: Request) => {
+  // Detecta se está em HTTPS baseado no request
+  const isSecure = req?.secure || req?.headers['x-forwarded-proto'] === 'https';
+  
   return {
     httpOnly: true,
-    secure: isSecure,
-    sameSite: sameSite as "lax" | "none",
+    secure: isSecure, // true apenas em HTTPS, false em HTTP (desenvolvimento)
+    sameSite: "lax" as const, // "lax" funciona melhor no mobile que "none"
     path: "/",
   };
 };
 
-const clearTokenCookie = (res: Response) => {
-  const cookieOptions = getCookieOptions();
+const clearTokenCookie = (res: Response, req?: Request) => {
+  const cookieOptions = getCookieOptions(req);
   res.clearCookie("token", cookieOptions);
 };
 
@@ -44,9 +43,9 @@ export const loginController = async (
     const { email, password } = req.body;
     const result = await loginUser({ email, password });
 
-    const cookieOptions = getCookieOptions();
+    const cookieOptions = getCookieOptions(req);
 
-    clearTokenCookie(res);
+    clearTokenCookie(res, req);
 
     res.cookie("token", result, {
       ...cookieOptions,
@@ -60,8 +59,8 @@ export const loginController = async (
   }
 };
 
-export const logoutController = async (_req: Request, res: Response) => {
-  clearTokenCookie(res);
+export const logoutController = async (req: Request, res: Response) => {
+  clearTokenCookie(res, req);
 
   res.status(200).json({ message: "Logout successful" });
 };
