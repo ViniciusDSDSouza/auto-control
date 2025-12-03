@@ -26,11 +26,14 @@ export const loginController = async (
     const { email, password } = req.body;
     const result = await loginUser({ email, password });
 
+    const isProduction = process.env.NODE_ENV === "production";
+    const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
+
     res.cookie("token", result, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 1000,
-      sameSite: "strict",
+      secure: isSecure,
+      maxAge: 12 * 60 * 60 * 1000,
+      sameSite: isProduction ? "lax" : "strict",
     });
 
     res.status(200).json({ message: "Login successful" });
@@ -41,7 +44,14 @@ export const loginController = async (
 };
 
 export const logoutController = async (_req: Request, res: Response) => {
-  res.clearCookie("token");
+  const isProduction = process.env.NODE_ENV === "production";
+  const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: isProduction ? "lax" : "strict",
+  });
   res.status(200).json({ message: "Logout successful" });
 };
 
