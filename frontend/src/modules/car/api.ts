@@ -33,7 +33,11 @@ export const carApi = createApi({
     }),
     createCar: builder.mutation<Car, CarDto>({
       query: (data) => ({ url: "/cars", method: "POST", body: data }),
-      invalidatesTags: ["Car", "Customer"],
+      invalidatesTags: (result, error, arg) => [
+        "Car",
+        "Customer",
+        { type: "Customer", id: arg.customerId },
+      ],
     }),
     updateCar: builder.mutation<Car, { id: string; data: CarDto }>({
       query: ({ id, data }) => ({
@@ -41,7 +45,11 @@ export const carApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["Car", "Customer"],
+      invalidatesTags: (result, error, arg) => [
+        "Car",
+        "Customer",
+        { type: "Customer", id: arg.data.customerId },
+      ],
     }),
     deleteCar: builder.mutation<void, string>({
       query: (id) => ({ url: `/cars/${id}`, method: "DELETE" }),

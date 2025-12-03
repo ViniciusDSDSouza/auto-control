@@ -37,7 +37,11 @@ export const noteApi = createApi({
     }),
     createNote: builder.mutation<Note, NoteDto>({
       query: (data) => ({ url: "/notes", method: "POST", body: data }),
-      invalidatesTags: ["Note", "Customer"],
+      invalidatesTags: (result, error, arg) => [
+        "Note",
+        "Customer",
+        { type: "Customer", id: arg.customerId },
+      ],
     }),
     updateNote: builder.mutation<Note, { id: string; data: NoteDto }>({
       query: ({ id, data }) => ({
@@ -45,7 +49,11 @@ export const noteApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["Note", "Customer"],
+      invalidatesTags: (result, error, arg) => [
+        "Note",
+        "Customer",
+        { type: "Customer", id: arg.data.customerId },
+      ],
     }),
     deleteNote: builder.mutation<void, string>({
       query: (id) => ({ url: `/notes/${id}`, method: "DELETE" }),

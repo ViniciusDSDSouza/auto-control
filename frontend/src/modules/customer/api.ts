@@ -37,7 +37,7 @@ export const customerApi = createApi({
     }),
     getCustomerById: builder.query<Customer, string>({
       query: (id) => `/customers/${id}`,
-      providesTags: ["Customer"],
+      providesTags: (result, error, id) => [{ type: "Customer", id }, "Customer"],
     }),
     createCustomer: builder.mutation<Customer, CustomerDto>({
       query: (data) => ({ url: "/customers", method: "POST", body: data }),
