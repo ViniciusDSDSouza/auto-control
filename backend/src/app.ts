@@ -19,6 +19,8 @@ const allowedOrigins: string[] = [
 
 export const app = express();
 
+app.set("trust proxy", true);
+
 app.use(
   cors({
     origin: allowedOrigins,
