@@ -31,6 +31,18 @@ export const loginController = async (
     const sameSite =
       isProduction && isSecure ? "none" : isProduction ? "lax" : "strict";
 
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "lax" });
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
     res.cookie("token", result, {
       httpOnly: true,
       secure: isSecure,
