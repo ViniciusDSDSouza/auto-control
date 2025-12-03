@@ -86,16 +86,28 @@ export function useLogoutUser() {
   const [logoutUser] = useLogoutUserMutation();
 
   async function handleLogoutUser() {
-    await logoutUser().unwrap();
+    try {
+      await logoutUser().unwrap();
 
-    toaster.create({
-      title: "Logout realizado com sucesso!",
-      description: "Você foi desconectado com sucesso!",
-      type: "success",
-      duration: 5000,
-    });
+      // Aguarda um pouco para garantir que o cookie foi limpo
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-    router.push("/login");
+      toaster.create({
+        title: "Logout realizado com sucesso!",
+        description: "Você foi desconectado com sucesso!",
+        type: "success",
+        duration: 3000,
+      });
+
+      // Redireciona para login
+      router.push("/login");
+      // Força reload para limpar qualquer estado do cliente
+      router.refresh();
+    } catch (error) {
+      // Mesmo com erro, redireciona para login
+      router.push("/login");
+      router.refresh();
+    }
   }
 
   return {

@@ -2,18 +2,45 @@ import { registerUser, loginUser } from "../services/authService";
 import { Request, Response } from "express";
 import { RegisterUserDto, LoginUserDto } from "../types/user";
 
+const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
+  const sameSite =
+    isProduction && isSecure ? "none" : isProduction ? "lax" : "strict";
+
+  return {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: sameSite as "strict" | "lax" | "none",
+    path: "/",
+  };
+};
+
 const clearTokenCookie = (res: Response) => {
-  const options = [
-    { httpOnly: true, secure: true, sameSite: "none" as const },
-    { httpOnly: true, secure: true, sameSite: "lax" as const },
-    { httpOnly: true, secure: true, sameSite: "strict" as const },
-    { httpOnly: true, secure: false, sameSite: "none" as const },
-    { httpOnly: true, secure: false, sameSite: "lax" as const },
-    { httpOnly: true, secure: false, sameSite: "strict" as const },
+  const isProduction = process.env.NODE_ENV === "production";
+  const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
+
+  // Lista todas as possíveis combinações de configurações de cookie
+  // que podem ter sido usadas anteriormente
+  const possibleConfigs: Array<{
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: "none" | "lax" | "strict";
+    path: string;
+  }> = [
+    // Configurações de produção (HTTPS)
+    { httpOnly: true, secure: true, sameSite: "none", path: "/" },
+    { httpOnly: true, secure: true, sameSite: "lax", path: "/" },
+    { httpOnly: true, secure: true, sameSite: "strict", path: "/" },
+    // Configurações de desenvolvimento (HTTP)
+    { httpOnly: true, secure: false, sameSite: "lax", path: "/" },
+    { httpOnly: true, secure: false, sameSite: "strict", path: "/" },
   ];
 
-  options.forEach((option) => {
-    res.clearCookie("token", option);
+  // Limpa com todas as configurações possíveis
+  // O Express só vai limpar cookies que realmente existem com essas configurações
+  possibleConfigs.forEach((config) => {
+    res.clearCookie("token", config);
   });
 };
 
@@ -41,18 +68,15 @@ export const loginController = async (
     const { email, password } = req.body;
     const result = await loginUser({ email, password });
 
-    const isProduction = process.env.NODE_ENV === "production";
-    const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
-    const sameSite =
-      isProduction && isSecure ? "none" : isProduction ? "lax" : "strict";
+    const cookieOptions = getCookieOptions();
 
+    // Limpa cookies antigos antes de setar o novo
     clearTokenCookie(res);
 
+    // Seta o novo cookie com a configuração correta
     res.cookie("token", result, {
-      httpOnly: true,
-      secure: isSecure,
-      maxAge: 12 * 60 * 60 * 1000,
-      sameSite: sameSite as "strict" | "lax" | "none",
+      ...cookieOptions,
+      maxAge: 12 * 60 * 60 * 1000, // 12 horas
     });
 
     res.status(200).json({ message: "Login successful" });
@@ -63,6 +87,7 @@ export const loginController = async (
 };
 
 export const logoutController = async (_req: Request, res: Response) => {
+  // Limpa todos os cookies possíveis com todas as configurações
   clearTokenCookie(res);
 
   res.status(200).json({ message: "Logout successful" });
