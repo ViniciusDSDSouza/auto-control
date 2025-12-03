@@ -55,8 +55,6 @@ export function AsyncSelectPart({
         throw new Error("URL da API não configurada");
       }
 
-      const normalizedBaseUrl = baseUrl.replace(/\/$/, "");
-
       const queryParams = new URLSearchParams({
         page: page.toString(),
         itemsPerPage: "4",
@@ -68,7 +66,7 @@ export function AsyncSelectPart({
         queryParams.append("name", searchQuery);
       }
 
-      const response = await fetch(`${normalizedBaseUrl}/parts?${queryParams}`, {
+      const response = await fetch(`${baseUrl}/parts?${queryParams}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
