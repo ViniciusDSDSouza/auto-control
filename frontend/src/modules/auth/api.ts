@@ -14,6 +14,13 @@ export const authApi = createApi({
     loginUser: builder.mutation<LoginUserResponse, LoginUserDto>({
       query: (data) => ({ url: "/login", method: "POST", body: data }),
       invalidatesTags: ["Auth"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Força invalidação do cache de autenticação após login bem-sucedido
+          dispatch(authApi.util.invalidateTags(["Auth"]));
+        } catch {}
+      },
     }),
     logoutUser: builder.mutation<void, void>({
       query: () => ({ url: "/logout", method: "POST" }),

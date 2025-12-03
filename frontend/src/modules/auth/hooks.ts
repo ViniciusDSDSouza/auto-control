@@ -3,12 +3,14 @@ import {
   useLoginUserMutation,
   useLogoutUserMutation,
   useRegisterUserMutation,
+  authApi,
 } from "./api";
 import { RegisterSchema } from "@/src/app/(authentication)/cadastro/schema";
 import { loginFormToDto, registerFormToDto } from "./adapter";
 import { useRouter } from "next/navigation";
 import { toaster } from "@/src/components/ui/toaster";
 import { LoginSchema } from "@/src/app/(authentication)/login/schema";
+import { useDispatch } from "react-redux";
 
 export function useRegisterUser() {
   const router = useRouter();
@@ -48,14 +50,48 @@ export function useRegisterUser() {
 
 export function useLoginUser() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [loginUser, { isLoading }] = useLoginUserMutation();
+  const { refetch: refetchCheckAuth } = useCheckAuthQuery(undefined, {
+    skip: true, // Não executa automaticamente
+  });
 
   async function handleLoginUser(data: LoginSchema) {
     try {
       const response = await loginUser(loginFormToDto(data)).unwrap();
 
-      // Aguardar um pouco para garantir que o cookie foi processado
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      // Aguardar mais tempo para garantir que o cookie foi processado (mobile pode ser mais lento)
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      // Invalidar cache manualmente
+      dispatch(authApi.util.invalidateTags(["Auth"]));
+
+      // Fazer um checkAuth manual para garantir que o cookie está funcionando
+      let authVerified = false;
+      let retries = 0;
+      const maxRetries = 3;
+
+      while (!authVerified && retries < maxRetries) {
+        try {
+          const authCheck = await refetchCheckAuth();
+          if (authCheck.data?.authenticated) {
+            authVerified = true;
+            break;
+          }
+        } catch (authError) {
+          console.error(`Tentativa ${retries + 1} de verificação de auth falhou:`, authError);
+        }
+        
+        if (!authVerified && retries < maxRetries - 1) {
+          // Aguardar um pouco antes de tentar novamente
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }
+        retries++;
+      }
+
+      if (!authVerified) {
+        throw new Error("Não foi possível verificar a autenticação após o login");
+      }
 
       toaster.create({
         title: "Login realizado com sucesso!",
@@ -64,9 +100,15 @@ export function useLoginUser() {
         duration: 5000,
       });
 
+      // Forçar refresh completo
       router.refresh();
-      router.push("/notas");
       
+      // Pequeno delay antes de redirecionar
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      
+      // Usar window.location para garantir navegação completa no mobile
+      window.location.href = "/notas";
+
       return response;
     } catch (error) {
       toaster.create({
