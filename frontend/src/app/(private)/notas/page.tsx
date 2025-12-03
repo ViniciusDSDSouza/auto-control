@@ -81,10 +81,15 @@ export default function NotasPage() {
           </Box>
         </Box>
 
-        <HStack gap={3} alignItems="center" justifyContent="space-between">
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          gap={3}
+          alignItems={{ base: "stretch", md: "center" }}
+          justifyContent="space-between"
+        >
           <Popover.Root id="date-range-picker">
-            <Popover.Trigger asChild w={280}>
-              <Button colorPalette="orange" size="lg">
+            <Popover.Trigger asChild w={{ base: "100%", md: 280 }}>
+              <Button colorPalette="orange" size="lg" w={{ base: "100%", md: "auto" }}>
                 <FaCalendar />
                 <Text ml={2}>
                   {dateRange
@@ -111,16 +116,17 @@ export default function NotasPage() {
             </Portal>
           </Popover.Root>
 
-          <Box flex={1} />
+          <Box flex={1} display={{ base: "none", md: "block" }} />
           <Button
             colorPalette="orange"
             onClick={handleOpenCreateDialog}
             size="lg"
+            w={{ base: "100%", md: "auto" }}
           >
             <FaPlus style={{ marginRight: "8px" }} />
             Nova Nota
           </Button>
-        </HStack>
+        </Stack>
 
         {isLoadingNotes ? (
           <CustomerTableSkeleton />
