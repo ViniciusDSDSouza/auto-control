@@ -19,26 +19,11 @@ const getCookieOptions = () => {
 };
 
 const clearTokenCookie = (res: Response) => {
-  // Lista apenas as configurações que realmente podem ter sido usadas
-  // Removido "strict" pois não deve ser usado em produção e cria cookies fantasmas
-  const possibleConfigs: Array<{
-    httpOnly: boolean;
-    secure: boolean;
-    sameSite: "none" | "lax";
-    path: string;
-  }> = [
-    // Configurações de produção (HTTPS) - cross-origin
-    { httpOnly: true, secure: true, sameSite: "none", path: "/" },
-    // Configurações de produção (HTTPS) - same-origin
-    { httpOnly: true, secure: true, sameSite: "lax", path: "/" },
-    // Configurações de desenvolvimento (HTTP)
-    { httpOnly: true, secure: false, sameSite: "lax", path: "/" },
-  ];
-
-  // Limpa apenas com as configurações relevantes
-  possibleConfigs.forEach((config) => {
-    res.clearCookie("token", config);
-  });
+  // Limpa apenas o cookie com a configuração atual
+  // Cookies antigos com configurações diferentes vão expirar naturalmente
+  // Não tentamos limpar todas as configurações possíveis para evitar cookies fantasmas
+  const cookieOptions = getCookieOptions();
+  res.clearCookie("token", cookieOptions);
 };
 
 export const registerController = async (
