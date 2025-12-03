@@ -9,9 +9,6 @@ export const authRateLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    return req.ip || req.socket.remoteAddress || "unknown";
-  },
 });
 
 export const rateLimiter = rateLimit({
