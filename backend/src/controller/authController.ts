@@ -5,40 +5,37 @@ import { RegisterUserDto, LoginUserDto } from "../types/user";
 const getCookieOptions = () => {
   const isProduction = process.env.NODE_ENV === "production";
   const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
-  const sameSite =
-    isProduction && isSecure ? "none" : isProduction ? "lax" : "strict";
+  // Em produção com HTTPS: "none" para cross-origin (Vercel -> Render)
+  // Em produção sem HTTPS ou dev: "lax"
+  // Nunca usar "strict" pois não funciona bem em cross-origin
+  const sameSite = isProduction && isSecure ? "none" : "lax";
 
   return {
     httpOnly: true,
     secure: isSecure,
-    sameSite: sameSite as "strict" | "lax" | "none",
+    sameSite: sameSite as "lax" | "none",
     path: "/",
   };
 };
 
 const clearTokenCookie = (res: Response) => {
-  const isProduction = process.env.NODE_ENV === "production";
-  const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
-
-  // Lista todas as possíveis combinações de configurações de cookie
-  // que podem ter sido usadas anteriormente
+  // Lista apenas as configurações que realmente podem ter sido usadas
+  // Removido "strict" pois não deve ser usado em produção e cria cookies fantasmas
   const possibleConfigs: Array<{
     httpOnly: boolean;
     secure: boolean;
-    sameSite: "none" | "lax" | "strict";
+    sameSite: "none" | "lax";
     path: string;
   }> = [
-    // Configurações de produção (HTTPS)
+    // Configurações de produção (HTTPS) - cross-origin
     { httpOnly: true, secure: true, sameSite: "none", path: "/" },
+    // Configurações de produção (HTTPS) - same-origin
     { httpOnly: true, secure: true, sameSite: "lax", path: "/" },
-    { httpOnly: true, secure: true, sameSite: "strict", path: "/" },
     // Configurações de desenvolvimento (HTTP)
     { httpOnly: true, secure: false, sameSite: "lax", path: "/" },
-    { httpOnly: true, secure: false, sameSite: "strict", path: "/" },
   ];
 
-  // Limpa com todas as configurações possíveis
-  // O Express só vai limpar cookies que realmente existem com essas configurações
+  // Limpa apenas com as configurações relevantes
   possibleConfigs.forEach((config) => {
     res.clearCookie("token", config);
   });
