@@ -5,9 +5,6 @@ import { RegisterUserDto, LoginUserDto } from "../types/user";
 const getCookieOptions = () => {
   const isProduction = process.env.NODE_ENV === "production";
   const isSecure = process.env.COOKIE_SECURE === "true" || isProduction;
-  // Em produção com HTTPS: "none" para cross-origin (Vercel -> Render)
-  // Em produção sem HTTPS ou dev: "lax"
-  // Nunca usar "strict" pois não funciona bem em cross-origin
   const sameSite = isProduction && isSecure ? "none" : "lax";
 
   return {
@@ -19,9 +16,6 @@ const getCookieOptions = () => {
 };
 
 const clearTokenCookie = (res: Response) => {
-  // Limpa apenas o cookie com a configuração atual
-  // Cookies antigos com configurações diferentes vão expirar naturalmente
-  // Não tentamos limpar todas as configurações possíveis para evitar cookies fantasmas
   const cookieOptions = getCookieOptions();
   res.clearCookie("token", cookieOptions);
 };
@@ -52,13 +46,11 @@ export const loginController = async (
 
     const cookieOptions = getCookieOptions();
 
-    // Limpa cookies antigos antes de setar o novo
     clearTokenCookie(res);
 
-    // Seta o novo cookie com a configuração correta
     res.cookie("token", result, {
       ...cookieOptions,
-      maxAge: 12 * 60 * 60 * 1000, // 12 horas
+      maxAge: 12 * 60 * 60 * 1000,
     });
 
     res.status(200).json({ message: "Login successful" });
@@ -69,7 +61,6 @@ export const loginController = async (
 };
 
 export const logoutController = async (_req: Request, res: Response) => {
-  // Limpa todos os cookies possíveis com todas as configurações
   clearTokenCookie(res);
 
   res.status(200).json({ message: "Logout successful" });

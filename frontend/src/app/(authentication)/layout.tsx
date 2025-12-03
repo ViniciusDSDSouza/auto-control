@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useCheckAuth } from "@/src/modules/auth/hooks";
+import { useCheckAuthQuery } from "@/src/modules/auth/api";
 import { Center, Spinner } from "@chakra-ui/react";
 
 export default function AuthenticationLayout({
@@ -11,13 +11,17 @@ export default function AuthenticationLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { authenticated, isLoading, isError } = useCheckAuth();
+  const { data, isLoading } = useCheckAuthQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
   useEffect(() => {
-    if (!isLoading && !isError && authenticated) {
+    if (!isLoading && data?.authenticated) {
       router.push("/notas");
     }
-  }, [router, authenticated, isLoading, isError]);
+  }, [router, data?.authenticated, isLoading]);
 
   if (isLoading) {
     return (

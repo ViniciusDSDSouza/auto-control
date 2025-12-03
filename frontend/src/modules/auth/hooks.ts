@@ -89,7 +89,6 @@ export function useLogoutUser() {
     try {
       await logoutUser().unwrap();
 
-      // Aguarda um pouco para garantir que o cookie foi limpo
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       toaster.create({
@@ -99,12 +98,9 @@ export function useLogoutUser() {
         duration: 3000,
       });
 
-      // Redireciona para login
       router.push("/login");
-      // Força reload para limpar qualquer estado do cliente
       router.refresh();
     } catch (error) {
-      // Mesmo com erro, redireciona para login
       router.push("/login");
       router.refresh();
     }
