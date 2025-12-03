@@ -6,7 +6,7 @@ import type {
 } from "@reduxjs/toolkit/query";
 
 const baseQueryWithCredentials = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  baseUrl: process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""),
   credentials: "include",
   prepareHeaders: (headers) => {
     return headers;

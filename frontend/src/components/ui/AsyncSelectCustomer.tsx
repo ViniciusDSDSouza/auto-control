@@ -58,6 +58,8 @@ export function AsyncSelectCustomer({
         throw new Error("URL da API não configurada");
       }
 
+      const normalizedBaseUrl = baseUrl.replace(/\/$/, "");
+
       const queryParams = new URLSearchParams({
         page: page.toString(),
         itemsPerPage: "4",
@@ -70,7 +72,7 @@ export function AsyncSelectCustomer({
         queryParams.append("phone", searchQuery);
       }
 
-      const response = await fetch(`${baseUrl}/customers?${queryParams}`, {
+      const response = await fetch(`${normalizedBaseUrl}/customers?${queryParams}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",

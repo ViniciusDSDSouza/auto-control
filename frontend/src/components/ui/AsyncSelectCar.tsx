@@ -57,6 +57,8 @@ export function AsyncSelectCar({
         throw new Error("URL da API não configurada");
       }
 
+      const normalizedBaseUrl = baseUrl.replace(/\/$/, "");
+
       const queryParams = new URLSearchParams({
         page: page.toString(),
         itemsPerPage: "4",
@@ -72,7 +74,7 @@ export function AsyncSelectCar({
         queryParams.append("brand", searchQuery);
       }
 
-      const response = await fetch(`${baseUrl}/cars?${queryParams}`, {
+      const response = await fetch(`${normalizedBaseUrl}/cars?${queryParams}`, {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
