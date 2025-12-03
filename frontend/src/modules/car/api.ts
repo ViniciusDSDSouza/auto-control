@@ -33,11 +33,16 @@ export const carApi = createApi({
     }),
     createCar: builder.mutation<Car, CarDto>({
       query: (data) => ({ url: "/cars", method: "POST", body: data }),
-      invalidatesTags: (result, error, arg) => [
-        "Car",
-        "Customer",
-        { type: "Customer", id: arg.customerId },
-      ],
+      invalidatesTags: (result, error, arg) => {
+        const tags: Array<"Car" | "Customer" | { type: "Customer"; id: string }> = [
+          "Car",
+          "Customer",
+        ];
+        if (arg.customerId) {
+          tags.push({ type: "Customer", id: String(arg.customerId) });
+        }
+        return tags;
+      },
     }),
     updateCar: builder.mutation<Car, { id: string; data: CarDto }>({
       query: ({ id, data }) => ({
@@ -45,11 +50,16 @@ export const carApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: (result, error, arg) => [
-        "Car",
-        "Customer",
-        { type: "Customer", id: arg.data.customerId },
-      ],
+      invalidatesTags: (result, error, arg) => {
+        const tags: Array<"Car" | "Customer" | { type: "Customer"; id: string }> = [
+          "Car",
+          "Customer",
+        ];
+        if (arg.data.customerId) {
+          tags.push({ type: "Customer", id: String(arg.data.customerId) });
+        }
+        return tags;
+      },
     }),
     deleteCar: builder.mutation<void, string>({
       query: (id) => ({ url: `/cars/${id}`, method: "DELETE" }),
