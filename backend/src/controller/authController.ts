@@ -16,7 +16,35 @@ const getCookieOptions = (req?: Request) => {
 
 const clearTokenCookie = (res: Response, req?: Request) => {
   const cookieOptions = getCookieOptions(req);
+  
+  // Tenta limpar o cookie com as opções atuais
   res.clearCookie("token", cookieOptions);
+  
+  // Tenta limpar sem secure (caso o cookie anterior tenha sido criado sem secure)
+  res.clearCookie("token", {
+    ...cookieOptions,
+    secure: false,
+  });
+  
+  // Tenta limpar com secure (caso o cookie anterior tenha sido criado com secure)
+  res.clearCookie("token", {
+    ...cookieOptions,
+    secure: true,
+  });
+  
+  // Tenta limpar apenas com path (configuração mínima)
+  res.clearCookie("token", { path: "/" });
+  
+  // Se houver host no request, tenta limpar com diferentes domínios
+  if (req?.headers.host) {
+    const host = req.headers.host.split(':')[0];
+    if (host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+      // Tenta com domínio com ponto inicial
+      res.clearCookie("token", { path: "/", domain: `.${host}` });
+      // Tenta com domínio sem ponto inicial
+      res.clearCookie("token", { path: "/", domain: host });
+    }
+  }
 };
 
 export const registerController = async (
