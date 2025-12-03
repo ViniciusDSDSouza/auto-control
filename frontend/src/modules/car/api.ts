@@ -5,7 +5,7 @@ import { Car, CarDto, GetCarsParams, PaginatedResponse } from "./types";
 export const carApi = createApi({
   reducerPath: "carApi",
   baseQuery,
-  tagTypes: ["Car"],
+  tagTypes: ["Car", "Customer"],
   endpoints: (builder) => ({
     getCars: builder.query<PaginatedResponse<Car>, GetCarsParams>({
       query: (params) => {
@@ -33,7 +33,7 @@ export const carApi = createApi({
     }),
     createCar: builder.mutation<Car, CarDto>({
       query: (data) => ({ url: "/cars", method: "POST", body: data }),
-      invalidatesTags: ["Car"],
+      invalidatesTags: ["Car", "Customer"],
     }),
     updateCar: builder.mutation<Car, { id: string; data: CarDto }>({
       query: ({ id, data }) => ({
@@ -41,11 +41,11 @@ export const carApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["Car"],
+      invalidatesTags: ["Car", "Customer"],
     }),
     deleteCar: builder.mutation<void, string>({
       query: (id) => ({ url: `/cars/${id}`, method: "DELETE" }),
-      invalidatesTags: ["Car"],
+      invalidatesTags: ["Car", "Customer"],
     }),
   }),
 });

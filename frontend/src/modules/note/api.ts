@@ -5,7 +5,7 @@ import { Note, NoteDto, GetNotesParams, PaginatedResponse } from "./types";
 export const noteApi = createApi({
   reducerPath: "noteApi",
   baseQuery,
-  tagTypes: ["Note"],
+  tagTypes: ["Note", "Customer"],
   endpoints: (builder) => ({
     getNotes: builder.query<PaginatedResponse<Note>, GetNotesParams>({
       query: (params) => {
@@ -37,7 +37,7 @@ export const noteApi = createApi({
     }),
     createNote: builder.mutation<Note, NoteDto>({
       query: (data) => ({ url: "/notes", method: "POST", body: data }),
-      invalidatesTags: ["Note"],
+      invalidatesTags: ["Note", "Customer"],
     }),
     updateNote: builder.mutation<Note, { id: string; data: NoteDto }>({
       query: ({ id, data }) => ({
@@ -45,11 +45,11 @@ export const noteApi = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["Note"],
+      invalidatesTags: ["Note", "Customer"],
     }),
     deleteNote: builder.mutation<void, string>({
       query: (id) => ({ url: `/notes/${id}`, method: "DELETE" }),
-      invalidatesTags: ["Note"],
+      invalidatesTags: ["Note", "Customer"],
     }),
   }),
 });
