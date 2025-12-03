@@ -9,6 +9,9 @@ export const authRateLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    trustProxy: false,
+  },
 });
 
 export const rateLimiter = rateLimit({
@@ -19,4 +22,7 @@ export const rateLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    trustProxy: false,
+  },
 });
