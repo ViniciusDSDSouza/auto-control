@@ -9,7 +9,9 @@
     "build": "esbuild src/server.ts --bundle --platform=node --target=node20 --outfile=dist/server.js --format=esm --external:@prisma/client --external:prisma --packages=external",
     "start": "node dist/server.js",
     "seed": "tsx prisma/seed.ts",
-    "test": "jest"
+    "test": "jest",
+    "build:prod": "npm install && npx prisma generate && npm run build",
+    "start:prod": "prisma migrate deploy && npm run start"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
