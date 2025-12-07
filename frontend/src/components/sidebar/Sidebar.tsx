@@ -111,7 +111,7 @@ export function Sidebar() {
 
       <Box
         p={4}
-        pb={{ base: 12, lg: 4 }}
+        pb={{ base: 24, lg: 4 }}
         borderRadius={{ base: "0", lg: "0 0 20px 0" }}
       >
         <Button
