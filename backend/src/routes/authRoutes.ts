@@ -11,5 +11,4 @@ export const authRoutes = Router();
 
 authRoutes.post("/register", authRateLimiter, registerController);
 authRoutes.post("/login", authRateLimiter, loginController);
-
 authRoutes.post("/logout", authMiddleware, logoutController);

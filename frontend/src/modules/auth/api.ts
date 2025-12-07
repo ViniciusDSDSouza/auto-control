@@ -5,7 +5,6 @@ import { RegisterUserDto, LoginUserDto, LoginUserResponse } from "./types";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery,
-  keepUnusedDataFor: 900,
   endpoints: (builder) => ({
     registerUser: builder.mutation<void, RegisterUserDto>({
       query: (data) => ({ url: "/register", method: "POST", body: data }),

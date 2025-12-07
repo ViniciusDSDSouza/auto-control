@@ -8,8 +8,8 @@ export default function PrivateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // A autenticação é verificada automaticamente pelo baseQuery
-  // Se qualquer request retornar 401, o usuário será redirecionado para /login
+  // Autenticação é tratada pelo baseQuery
+  // Qualquer request 401 redireciona para /login
 
   return (
     <>
