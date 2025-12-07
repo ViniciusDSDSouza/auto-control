@@ -2,24 +2,6 @@ import { registerUser, loginUser } from "../services/authService";
 import { Request, Response } from "express";
 import { RegisterUserDto, LoginUserDto } from "../types/user";
 
-const getCookieOptions = (req?: Request) => {
-  const isSecure = req?.secure || req?.headers["x-forwarded-proto"] === "https";
-
-  // Em produção (HTTPS), usar sameSite: "none" para permitir cross-origin
-  // Em desenvolvimento (HTTP), usar sameSite: "lax"
-  return {
-    httpOnly: true,
-    secure: isSecure,
-    sameSite: isSecure ? ("none" as const) : ("lax" as const),
-    path: "/",
-  };
-};
-
-const clearTokenCookie = (res: Response, req?: Request) => {
-  const cookieOptions = getCookieOptions(req);
-  res.clearCookie("token", cookieOptions);
-};
-
 export const registerController = async (
   req: Request<{}, {}, RegisterUserDto>,
   res: Response
@@ -42,26 +24,15 @@ export const loginController = async (
 ) => {
   try {
     const { email, password } = req.body;
-    const result = await loginUser({ email, password });
+    const token = await loginUser({ email, password });
 
-    const cookieOptions = getCookieOptions(req);
-
-    clearTokenCookie(res, req);
-
-    res.cookie("token", result, {
-      ...cookieOptions,
-      maxAge: 12 * 60 * 60 * 1000,
-    });
-
-    res.status(200).json({ message: "Login successful" });
+    res.status(200).json({ token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to login user" });
   }
 };
 
-export const logoutController = async (req: Request, res: Response) => {
-  clearTokenCookie(res, req);
-
+export const logoutController = async (_req: Request, res: Response) => {
   res.status(200).json({ message: "Logout successful" });
 };

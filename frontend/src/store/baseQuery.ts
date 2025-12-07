@@ -5,10 +5,15 @@ import type {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 
-const baseQueryWithCredentials = fetchBaseQuery({
+const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, ""),
-  credentials: "include",
   prepareHeaders: (headers) => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+    }
     return headers;
   },
 });
@@ -18,10 +23,11 @@ export const baseQuery: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  const result = await baseQueryWithCredentials(args, api, extraOptions);
+  const result = await baseQueryWithAuth(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
     if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
       const currentPath = window.location.pathname;
       if (
         !currentPath.startsWith("/login") &&

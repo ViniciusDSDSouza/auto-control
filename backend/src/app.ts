@@ -6,7 +6,6 @@ import { carRoutes } from "./routes/carRoutes";
 import { partRoutes } from "./routes/partRoutes";
 import { enumNoteStatusRoutes } from "./routes/enumNoteStatusRoutes";
 import { noteRoutes } from "./routes/noteRoutes";
-import cookieParser from "cookie-parser";
 import { rateLimiter } from "./utils/rateLimiter";
 import { healthCheckRoutes } from "./routes/healthCheckRoutes";
 import helmet from "helmet";
@@ -26,9 +25,6 @@ app.use(
     origin: allowedOrigins,
     methods: "GET, POST, PUT, DELETE",
     allowedHeaders: "Content-Type, Authorization",
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
   })
 );
 
@@ -38,8 +34,6 @@ app.use(
     crossOriginEmbedderPolicy: false,
   })
 );
-
-app.use(cookieParser());
 
 app.use(express.json());
 

@@ -52,6 +52,8 @@ export function useLoginUser() {
     try {
       const response = await loginUser(loginFormToDto(data)).unwrap();
 
+      localStorage.setItem("token", response.token);
+
       toaster.create({
         title: "Login realizado com sucesso!",
         description: "Você pode agora acessar o sistema!",
@@ -59,7 +61,6 @@ export function useLoginUser() {
         duration: 5000,
       });
 
-      // Redireciona diretamente após login bem-sucedido
       window.location.href = "/notas";
 
       return response;
@@ -86,21 +87,20 @@ export function useLogoutUser() {
   const [logoutUser] = useLogoutUserMutation();
 
   async function handleLogoutUser() {
+    localStorage.removeItem("token");
+
     try {
       await logoutUser().unwrap();
+    } catch {}
 
-      toaster.create({
-        title: "Logout realizado com sucesso!",
-        description: "Você foi desconectado com sucesso!",
-        type: "success",
-        duration: 3000,
-      });
+    toaster.create({
+      title: "Logout realizado com sucesso!",
+      description: "Você foi desconectado com sucesso!",
+      type: "success",
+      duration: 3000,
+    });
 
-      router.push("/login");
-    } catch (error) {
-      // Mesmo com erro, redireciona para login
-      router.push("/login");
-    }
+    router.push("/login");
   }
 
   return {
