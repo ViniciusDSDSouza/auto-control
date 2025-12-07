@@ -109,7 +109,11 @@ export function Sidebar() {
         </Stack>
       </Box>
 
-      <Box p={4} borderRadius={{ base: "0", lg: "0 0 20px 0" }}>
+      <Box
+        p={4}
+        pb={{ base: 12, lg: 4 }}
+        borderRadius={{ base: "0", lg: "0 0 20px 0" }}
+      >
         <Button
           variant="outline"
           size="md"
