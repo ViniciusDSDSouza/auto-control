@@ -27,6 +27,7 @@ export default function RegisterPage() {
   return (
     <Box
       minH="100vh"
+      css={{ minHeight: "100dvh" }}
       bgGradient="linear(to-br, orange.50, orange.100)"
       display="flex"
       flexDirection="column"
