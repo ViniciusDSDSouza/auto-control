@@ -72,10 +72,11 @@ export function AsyncSelectCar({
         queryParams.append("brand", searchQuery);
       }
 
+      const token = localStorage.getItem("token");
       const response = await fetch(`${baseUrl}/cars?${queryParams}`, {
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
 

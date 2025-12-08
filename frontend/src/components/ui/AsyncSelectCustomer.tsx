@@ -70,10 +70,11 @@ export function AsyncSelectCustomer({
         queryParams.append("phone", searchQuery);
       }
 
+      const token = localStorage.getItem("token");
       const response = await fetch(`${baseUrl}/customers?${queryParams}`, {
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
 

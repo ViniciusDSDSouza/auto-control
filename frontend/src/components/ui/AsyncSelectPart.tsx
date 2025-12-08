@@ -66,10 +66,11 @@ export function AsyncSelectPart({
         queryParams.append("name", searchQuery);
       }
 
+      const token = localStorage.getItem("token");
       const response = await fetch(`${baseUrl}/parts?${queryParams}`, {
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
 
