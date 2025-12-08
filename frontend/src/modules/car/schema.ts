@@ -5,14 +5,7 @@ export const carSchema = z.object({
   brand: z.string().min(1, { message: "Marca é obrigatória" }),
   model: z.string().min(1, { message: "Modelo é obrigatório" }),
   plate: z.string().optional(),
-  year: z
-    .number({ message: "Ano deve ser um número válido" })
-    .int({ message: "Ano deve ser um número inteiro" })
-    .min(1900, { message: "Ano deve ser maior ou igual a 1900" })
-    .max(new Date().getFullYear() + 1, {
-      message: `Ano deve ser menor ou igual a ${new Date().getFullYear() + 1}`,
-    })
-    .optional(),
+  year: z.union([z.number(), z.nan()]).optional(),
   color: z.string().min(1, { message: "Cor é obrigatória" }),
 });
 

@@ -66,7 +66,7 @@ export function CarFormDialog({
       brand: data.brand.trim(),
       model: data.model.trim(),
       plate: data.plate?.trim() || undefined,
-      year: data.year || undefined,
+      year: data.year && !Number.isNaN(data.year) ? data.year : undefined,
       color: data.color.trim(),
     };
 
@@ -131,7 +131,7 @@ export function CarFormDialog({
                 />
 
                 <FormInput
-                  label="Ano"
+                  label="Ano (opcional)"
                   type="number"
                   placeholder="Ex: 2024"
                   min="1900"
