@@ -19,6 +19,7 @@ export const getAllPartsController = async (
     const parts = await getAllParts({
       page: page ? Number(page) : undefined,
       itemsPerPage: itemsPerPage ? Number(itemsPerPage) : undefined,
+      name: name as string | undefined,
       orderBy: orderBy as "name" | "model" | "price" | "updatedAt",
       orderDirection: orderDirection as "asc" | "desc",
     });
