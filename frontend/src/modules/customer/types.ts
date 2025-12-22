@@ -4,6 +4,43 @@ export interface CustomerDto {
   email?: string;
 }
 
+export interface PartInNote {
+  id: string;
+  noteId: string;
+  partId: string;
+  quantity: number;
+  price: number;
+  createdAt: string;
+  updatedAt: string;
+  part?: {
+    id: string;
+    name: string;
+    model: string;
+    price: number;
+  };
+}
+
+export interface CustomerNote {
+  id: string;
+  customerId: string;
+  carId: string;
+  laborPrice: number;
+  partsPrice: number;
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  car?: {
+    id: string;
+    brand: string;
+    model: string;
+    plate?: string;
+    year?: number;
+    color: string;
+  };
+  parts?: PartInNote[];
+}
+
 export interface Customer extends CustomerDto {
   id: string;
   createdAt: string;
@@ -19,25 +56,7 @@ export interface Customer extends CustomerDto {
     createdAt: string;
     updatedAt: string;
   }>;
-  notes?: Array<{
-    id: string;
-    customerId: string;
-    carId: string;
-    laborPrice: number;
-    partsPrice: number;
-    totalPrice: number;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
-    car?: {
-      id: string;
-      brand: string;
-      model: string;
-      plate?: string;
-      year?: number;
-      color: string;
-    };
-  }>;
+  notes?: CustomerNote[];
 }
 
 export interface GetCustomersParams {

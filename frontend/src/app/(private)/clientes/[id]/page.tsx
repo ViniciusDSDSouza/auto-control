@@ -19,6 +19,7 @@ import { formatDate } from "@/src/libs/formatDate";
 import { formatCurrency } from "@/src/libs/formatCurrency";
 import { NoteStatus } from "@/src/modules/note/types";
 import { getStatusBadgeColor, getStatusLabel } from "@/src/libs/noteStatus";
+import { BudgetPdfButton } from "@/src/components/pdf/BudgetPdfButton";
 
 export default function ClientesOverviewPage() {
   const { id } = useParams();
@@ -225,7 +226,7 @@ export default function ClientesOverviewPage() {
                         fontSize="xs"
                         fontWeight="bold"
                         minW="200px"
-                        w="35%"
+                        w="30%"
                         color="black"
                         pl={4}
                       >
@@ -234,8 +235,8 @@ export default function ClientesOverviewPage() {
                       <Table.ColumnHeader
                         fontSize="xs"
                         fontWeight="bold"
-                        minW="120px"
-                        w="20%"
+                        minW="100px"
+                        w="15%"
                         color="black"
                       >
                         Total
@@ -252,11 +253,21 @@ export default function ClientesOverviewPage() {
                       <Table.ColumnHeader
                         fontSize="xs"
                         fontWeight="bold"
-                        minW="120px"
-                        w="30%"
+                        minW="100px"
+                        w="20%"
                         color="black"
                       >
                         Data
+                      </Table.ColumnHeader>
+                      <Table.ColumnHeader
+                        fontSize="xs"
+                        fontWeight="bold"
+                        minW="80px"
+                        w="10%"
+                        color="black"
+                        textAlign="center"
+                      >
+                        Ações
                       </Table.ColumnHeader>
                     </Table.Row>
                   </Table.Header>
@@ -264,7 +275,7 @@ export default function ClientesOverviewPage() {
                     {notes.length === 0 ? (
                       <Table.Row>
                         <Table.Cell
-                          colSpan={4}
+                          colSpan={5}
                           textAlign="center"
                           py={8}
                           color="gray.500"
@@ -285,7 +296,7 @@ export default function ClientesOverviewPage() {
                           <Table.Cell
                             fontSize="lg"
                             color="gray.600"
-                            minW="120px"
+                            minW="100px"
                             py={4}
                           >
                             {formatCurrency(note.totalPrice)}
@@ -303,10 +314,19 @@ export default function ClientesOverviewPage() {
                           <Table.Cell
                             fontSize="lg"
                             color="gray.600"
-                            minW="120px"
+                            minW="100px"
                             py={4}
                           >
                             {formatDate(note.createdAt)}
+                          </Table.Cell>
+                          <Table.Cell
+                            minW="80px"
+                            py={4}
+                            textAlign="center"
+                          >
+                            {customer && (
+                              <BudgetPdfButton note={note} customer={customer} />
+                            )}
                           </Table.Cell>
                         </Table.Row>
                       ))

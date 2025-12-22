@@ -81,6 +81,11 @@ export const getCustomerById = async (id: string) => {
         notes: {
           include: {
             car: true,
+            parts: {
+              include: {
+                part: true,
+              },
+            },
           },
         },
       },
